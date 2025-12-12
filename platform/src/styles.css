@@ -176,6 +176,8 @@
   --logo-frame-a: var(--primary);
   --logo-frame-b: var(--chart-2);
   --logo-frame-c: var(--chart-4);
+  --logo-gap: 22px;
+  --logo-stroke: 2px;
 
   /* Preferred (modern) */
   --logo-surface: color-mix(in oklch, var(--card) 92%, transparent);
@@ -185,11 +187,7 @@
 
   position: relative;
   isolation: isolate;
-  border: 1px solid transparent;
-  background:
-    linear-gradient(var(--logo-surface), var(--logo-surface)) padding-box,
-    linear-gradient(135deg, var(--logo-frame-a), var(--logo-frame-b), var(--logo-frame-c))
-      border-box;
+  background: linear-gradient(var(--logo-surface), var(--logo-surface));
 }
 
 /* "Circuit glow" + edge nodes, rendered UNDER content (no z-index overrides). */
@@ -211,9 +209,46 @@
   transition: opacity 180ms ease, filter 180ms ease;
 }
 
+.logo-border::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0.9;
+  filter: saturate(1.15);
+  transition: opacity 180ms ease, filter 180ms ease;
+  background:
+    /* Top edge (left + right), gap in the middle */
+    linear-gradient(135deg, var(--logo-frame-a), var(--logo-frame-b), var(--logo-frame-c))
+      top left / calc(50% - (var(--logo-gap) / 2)) var(--logo-stroke) no-repeat,
+    linear-gradient(135deg, var(--logo-frame-a), var(--logo-frame-b), var(--logo-frame-c))
+      top right / calc(50% - (var(--logo-gap) / 2)) var(--logo-stroke) no-repeat,
+    /* Bottom edge (left + right) */
+    linear-gradient(135deg, var(--logo-frame-a), var(--logo-frame-b), var(--logo-frame-c))
+      bottom left / calc(50% - (var(--logo-gap) / 2)) var(--logo-stroke) no-repeat,
+    linear-gradient(135deg, var(--logo-frame-a), var(--logo-frame-b), var(--logo-frame-c))
+      bottom right / calc(50% - (var(--logo-gap) / 2)) var(--logo-stroke) no-repeat,
+    /* Left edge (top + bottom) */
+    linear-gradient(135deg, var(--logo-frame-a), var(--logo-frame-b), var(--logo-frame-c))
+      top left / var(--logo-stroke) calc(50% - (var(--logo-gap) / 2)) no-repeat,
+    linear-gradient(135deg, var(--logo-frame-a), var(--logo-frame-b), var(--logo-frame-c))
+      bottom left / var(--logo-stroke) calc(50% - (var(--logo-gap) / 2)) no-repeat,
+    /* Right edge (top + bottom) */
+    linear-gradient(135deg, var(--logo-frame-a), var(--logo-frame-b), var(--logo-frame-c))
+      top right / var(--logo-stroke) calc(50% - (var(--logo-gap) / 2)) no-repeat,
+    linear-gradient(135deg, var(--logo-frame-a), var(--logo-frame-b), var(--logo-frame-c))
+      bottom right / var(--logo-stroke) calc(50% - (var(--logo-gap) / 2)) no-repeat;
+}
+
 .logo-border:hover::before {
   opacity: 0.36;
   filter: saturate(1.3);
+}
+
+.logo-border:hover::after {
+  opacity: 1;
+  filter: saturate(1.25);
 }
 
 .logo-border--ghost {

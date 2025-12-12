@@ -6,12 +6,17 @@ import {
   ExternalLink,
   Flame,
   Gift,
+  Github,
   LayoutGrid,
+  MessageCircle,
   MessagesSquare,
   Network,
+  Radio,
   Search,
+  Send,
   Sparkles,
   Swords,
+  Twitter,
   UserRound,
   Users,
   Wand2,
@@ -31,6 +36,29 @@ import {
   SidebarSeparator,
 } from "~/components/ui/sidebar";
 import { WalletProfile } from "~/components/wallet/wallet-profile";
+
+function SocialIconLink({
+  href,
+  label,
+  children,
+}: {
+  href: string;
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={label}
+      title={label}
+      className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+    >
+      {children}
+    </a>
+  );
+}
 
 const navItems = [
   {
@@ -173,6 +201,28 @@ export function DashboardSidebar() {
 
       <SidebarFooter className="p-4">
         <WalletProfile />
+        <div className="mt-3 flex items-center justify-between">
+          <div className="flex items-center gap-1">
+            <SocialIconLink href="https://x.com/regent_cx" label="X / Twitter">
+              <Twitter className="size-4" />
+            </SocialIconLink>
+            <SocialIconLink href="https://github.com/regent-ai" label="GitHub">
+              <Github className="size-4" />
+            </SocialIconLink>
+            <SocialIconLink href="https://farcaster.xyz/regent" label="Farcaster">
+              <Radio className="size-4" />
+            </SocialIconLink>
+            <SocialIconLink
+              href="https://t.me/+pJHTcXBj3yxmZmEx"
+              label="Telegram"
+            >
+              <Send className="size-4" />
+            </SocialIconLink>
+            <SocialIconLink href="https://discord.gg/regents" label="Discord">
+              <MessageCircle className="size-4" />
+            </SocialIconLink>
+          </div>
+        </div>
         <div className="flex items-center justify-between group-data-[collapsible=icon]:justify-center">
           <ThemeToggle />
           <span className="text-[10px] text-muted-foreground/50 group-data-[collapsible=icon]:hidden">

@@ -34,9 +34,22 @@ export function DashboardHeader() {
 
   return (
     <header className="sticky top-0 z-10 flex w-full items-center gap-2 border-b bg-card px-3 py-3 sm:gap-3 sm:px-6 sm:py-4">
-      <h1 className="flex-1 truncate text-base font-medium sm:text-lg">
-        {title}
-      </h1>
+      <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
+        <Link
+          to="/"
+          className="shrink-0 rounded-md p-1 transition-colors hover:bg-muted"
+        >
+          <img
+            src="/Regent_Logo.svg"
+            alt="Regent"
+            className="h-7 w-7 sm:h-8 sm:w-8"
+            decoding="async"
+          />
+        </Link>
+        <h1 className="min-w-0 truncate text-base font-medium sm:text-lg">
+          {title}
+        </h1>
+      </div>
 
       {pathname.startsWith("/explorer") ? null : (
         <div className="relative hidden md:block">

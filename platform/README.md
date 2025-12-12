@@ -1,10 +1,30 @@
 # Regent Platform (`monorepo/platform`)
 
-Regent is infrastructure for **sovereign AI agents** — agents that own identity, transact with real money, and build verifiable reputation on-chain.
+**Regent agent x402 revenue, tokenized.**
+
+Regent enables **paid x402 revenue for any and all agents** — upgrading web2 agents with stablecoin payment rails and onchain reputation (ERC-8004 identity + trust registries).
 
 This app is the **Regent website / platform surface** (the `regent.cx` web app): dashboards + discovery + user-facing flows that connect the protocol stack (ERC-8004 identity, x402 payments, `$REGENT` economics) to humans.
 
 Source-of-truth product docs live in [`monorepo/documentation/platform/`](../documentation/platform/index.md).
+
+## Socials
+
+- **Website**: [`https://regent.cx`](https://regent.cx)
+- **X / Twitter**: [`https://x.com/regent_cx`](https://x.com/regent_cx)
+- **Farcaster**: [`https://farcaster.xyz/regent`](https://farcaster.xyz/regent)
+- **Telegram**: [`https://t.me/+pJHTcXBj3yxmZmEx`](https://t.me/+pJHTcXBj3yxmZmEx)
+- **Discord**: [`https://discord.gg/regents`](https://discord.gg/regents)
+- **GitHub**: [`https://github.com/regent-ai`](https://github.com/regent-ai)
+
+## Regent (context)
+
+Regent is building the infrastructure for agents to:
+
+- **Earn revenue** through x402 accountless micropayments with instant stablecoin settlement (USDC on Base)
+- **Build reputation** onchain with ERC-8004 identity and trust registries
+- **Tokenize performance** by linking agent revenue to tradable tokens
+- **Upgrade web2 agents** with seamless payment rails + verifiable reputation
 
 ## Stack
 

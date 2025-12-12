@@ -475,7 +475,7 @@ function ExplorerPage() {
 
       if (!agent) {
         return (
-          <div className="logo-border logo-border--ghost absolute inset-2 flex items-center justify-center rounded-xl">
+          <div className="logo-border logo-border--ghost absolute inset-2 flex items-center justify-center rounded-3xl">
             <span className="text-xs text-muted-foreground/30">#{gridIndex}</span>
           </div>
         );
@@ -846,7 +846,7 @@ const AgentGridCell = memo(function AgentGridCell({
       type="button"
       ref={cardRef}
       onClick={handleOpen}
-      className={`agent-card logo-border logo-border--solid absolute inset-2 flex flex-col overflow-hidden rounded-xl text-left backdrop-blur-sm transition-[transform,box-shadow,filter] ${
+      className={`agent-card logo-border logo-border--solid absolute inset-2 flex flex-col overflow-hidden rounded-3xl text-left backdrop-blur-sm transition-[transform,box-shadow,filter] ${
         isMoving
           ? "shadow-xl"
           : "shadow-md hover:shadow-lg hover:shadow-primary/10 hover:-translate-y-0.5 hover:scale-[1.01] hover:brightness-[1.02]"
