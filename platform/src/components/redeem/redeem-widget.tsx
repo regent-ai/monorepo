@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { ExternalLink, Loader2 } from "lucide-react";
 import { base } from "viem/chains";
 import {
   createWalletClient,
@@ -123,6 +123,14 @@ export function RedeemWidget({ variant = "simple" }: RedeemWidgetProps) {
     ANIMATA1: false,
     ANIMATA2: false,
   });
+  const [accessPassHoldings, setAccessPassHoldings] = React.useState<
+    number[] | null
+  >(null);
+  const [accessPassError, setAccessPassError] = React.useState<string | null>(
+    null
+  );
+  const [isFetchingAccessPassHoldings, setIsFetchingAccessPassHoldings] =
+    React.useState<boolean>(false);
   const [claimable, setClaimable] = React.useState<bigint | null>(null);
   const [remaining, setRemaining] = React.useState<bigint | null>(null);
   const [nftApproved, setNftApproved] = React.useState<boolean>(false);
@@ -160,6 +168,8 @@ export function RedeemWidget({ variant = "simple" }: RedeemWidgetProps) {
   const holdingsWantedKeyRef = React.useRef<string | null>(null);
   const holdingsInFlightKeyRef = React.useRef<string | null>(null);
   const ownershipKeyRef = React.useRef<string | null>(null);
+  const accessPassWantedKeyRef = React.useRef<string | null>(null);
+  const accessPassInFlightKeyRef = React.useRef<string | null>(null);
 
   React.useEffect(() => {
     if (wallet !== sharedWallet.wallet) setWallet(sharedWallet.wallet);
@@ -342,6 +352,7 @@ export function RedeemWidget({ variant = "simple" }: RedeemWidgetProps) {
       await publicClient.waitForTransactionReceipt({ hash });
       // Redeem transfers the Animata NFT; refresh holdings so chips update.
       void fetchHoldings();
+      void fetchAccessPassHoldings();
       await refreshClaimable();
       try {
         let attempts = 0;
@@ -484,6 +495,63 @@ export function RedeemWidget({ variant = "simple" }: RedeemWidgetProps) {
     }
   }
 
+  async function fetchAccessPassHoldings() {
+    const connected = sharedWallet.account ?? account;
+    if (!connected) return;
+
+    const desiredKey = `${connected}:animata-pass`;
+    accessPassWantedKeyRef.current = desiredKey;
+    if (accessPassInFlightKeyRef.current) return;
+
+    accessPassInFlightKeyRef.current = desiredKey;
+    setIsFetchingAccessPassHoldings(true);
+    setAccessPassError(null);
+    try {
+      const res = await fetch(
+        `/api/opensea?address=${connected}&collection=animata-pass`,
+        { cache: "no-store" }
+      );
+      if (!res.ok) {
+        const text = await res.text();
+        const isHtml =
+          (res.headers.get("content-type") ?? "").includes("text/html") ||
+          text.trimStart().startsWith("<!DOCTYPE html");
+        if (
+          res.status === 404 ||
+          text.includes("Cannot GET /api/opensea") ||
+          isHtml
+        ) {
+          throw new Error(
+            "Access pass holdings lookup is unavailable (missing GET /api/opensea)."
+          );
+        }
+        if (
+          res.status === 500 &&
+          text.toLowerCase().includes("opensea_api_key")
+        ) {
+          throw new Error(
+            "Access pass holdings are unavailable (server missing OPENSEA_API_KEY)."
+          );
+        }
+        throw new Error(`Access pass holdings lookup failed: ${text}`);
+      }
+
+      const data = (await res.json()) as { animataPass?: number[] };
+      if (accessPassWantedKeyRef.current !== desiredKey) return;
+
+      setAccessPassHoldings(
+        Array.isArray(data.animataPass) ? data.animataPass : []
+      );
+    } catch (e: unknown) {
+      setAccessPassError((e as Error)?.message ?? String(e));
+    } finally {
+      accessPassInFlightKeyRef.current = null;
+      setIsFetchingAccessPassHoldings(false);
+      const nextKey = accessPassWantedKeyRef.current;
+      if (nextKey && nextKey !== desiredKey) void fetchAccessPassHoldings();
+    }
+  }
+
   async function fetchHoldings() {
     const { account: connected, source: sourceForFetch } =
       latestHoldingsParamsRef.current;
@@ -570,6 +638,18 @@ export function RedeemWidget({ variant = "simple" }: RedeemWidgetProps) {
     void fetchHoldings();
   }, [sharedWallet.account, source]);
 
+  const accessPassAccountRef = React.useRef<`0x${string}` | null>(null);
+  React.useEffect(() => {
+    const connected = sharedWallet.account ?? account;
+    if (connected !== accessPassAccountRef.current) {
+      accessPassAccountRef.current = connected;
+      setAccessPassHoldings(null);
+      setAccessPassError(null);
+    }
+    if (!connected) return;
+    void fetchAccessPassHoldings();
+  }, [sharedWallet.account]);
+
   React.useEffect(() => {
     if (!account && !sharedWallet.account) return;
     void runPrechecks();
@@ -642,6 +722,32 @@ export function RedeemWidget({ variant = "simple" }: RedeemWidgetProps) {
       {/* Collection Selection */}
       <div className="rounded-xl border border-border/50 bg-card/50 p-5 backdrop-blur-sm">
         <h3 className="mb-4 text-lg font-semibold">Select NFT to Redeem</h3>
+        <div className="-mt-2 mb-4 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+          <a
+            href="https://opensea.io/collection/animata"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 hover:text-foreground"
+          >
+            Animata I <ExternalLink className="size-3" />
+          </a>
+          <a
+            href="https://opensea.io/collection/regent-animata-ii"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 hover:text-foreground"
+          >
+            Animata II <ExternalLink className="size-3" />
+          </a>
+          <a
+            href="https://opensea.io/collection/animata-pass"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 hover:text-foreground"
+          >
+            Regent Animata Pass <ExternalLink className="size-3" />
+          </a>
+        </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label className="mb-2 block text-sm text-muted-foreground">
@@ -901,6 +1007,75 @@ export function RedeemWidget({ variant = "simple" }: RedeemWidgetProps) {
         </div>
       )}
 
+      {/* Regent Animata Access Pass (separate collection, no redeem logic) */}
+      {connectedAccount && (
+        <div className="rounded-xl border border-border/50 bg-card/50 p-5 backdrop-blur-sm">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h3 className="text-lg font-semibold">
+                Regent Animata Access Pass
+              </h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Base collection (contract {COLLECTION3.slice(0, 6)}…
+                {COLLECTION3.slice(-4)})
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={fetchAccessPassHoldings}
+                disabled={isFetchingAccessPassHoldings}
+              >
+                {isFetchingAccessPassHoldings ? (
+                  <span className="inline-flex items-center gap-2">
+                    <Loader2 className="size-4 animate-spin" />
+                    Loading
+                  </span>
+                ) : (
+                  "Refresh"
+                )}
+              </Button>
+              <Button variant="ghost" size="sm" asChild>
+                <a
+                  href="https://opensea.io/collection/animata-pass"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  OpenSea <ExternalLink className="ml-2 size-4" />
+                </a>
+              </Button>
+            </div>
+          </div>
+
+          {accessPassError && (
+            <div className="mt-3 rounded-lg border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">
+              {accessPassError}
+            </div>
+          )}
+
+          <div className="mt-3 flex flex-wrap gap-2">
+            {accessPassHoldings === null ? (
+              <span className="text-sm text-muted-foreground">
+                {isFetchingAccessPassHoldings ? "Loading…" : "Not loaded"}
+              </span>
+            ) : accessPassHoldings.length === 0 ? (
+              <span className="text-sm text-muted-foreground">None found</span>
+            ) : (
+              accessPassHoldings.map((id) => (
+                <span
+                  key={`animata-pass-${id}`}
+                  className="rounded-lg border border-border px-3 py-1.5 text-sm"
+                >
+                  #{id}
+                </span>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Redeemer address info */}
       {redeemerAddress ? (
         <p className="text-center text-xs text-muted-foreground">
@@ -919,6 +1094,7 @@ export function RedeemWidget({ variant = "simple" }: RedeemWidgetProps) {
             className="absolute inset-0 bg-background/80 backdrop-blur-sm"
             onClick={() => {
               void fetchHoldings();
+              void fetchAccessPassHoldings();
               setShowSuccess(false);
             }}
           />
@@ -939,6 +1115,7 @@ export function RedeemWidget({ variant = "simple" }: RedeemWidgetProps) {
                 variant="outline"
                 onClick={() => {
                   void fetchHoldings();
+                  void fetchAccessPassHoldings();
                   setShowSuccess(false);
                 }}
               >
@@ -948,6 +1125,7 @@ export function RedeemWidget({ variant = "simple" }: RedeemWidgetProps) {
                 onClick={() => {
                   void refreshClaimable();
                   void fetchHoldings();
+                  void fetchAccessPassHoldings();
                   setShowSuccess(false);
                 }}
                 className="bg-chart-2 text-chart-2-foreground hover:bg-chart-2/90"

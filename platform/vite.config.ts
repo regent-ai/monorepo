@@ -33,6 +33,7 @@ function openSeaDevApi(): Plugin {
 
           const SLUG1 = "animata";
           const SLUG2 = "regent-animata-ii";
+          const SLUG3 = "animata-pass";
 
           const apiKey = process.env.OPENSEA_API_KEY;
           if (!apiKey) {
@@ -104,21 +105,25 @@ function openSeaDevApi(): Plugin {
 
           let animata1: number[] = [];
           let animata2: number[] = [];
+          let animataPass: number[] = [];
 
           if (collection === SLUG1) {
             animata1 = await fetchAllForCollection(SLUG1);
           } else if (collection === SLUG2) {
             animata2 = await fetchAllForCollection(SLUG2);
+          } else if (collection === SLUG3) {
+            animataPass = await fetchAllForCollection(SLUG3);
           } else {
-            [animata1, animata2] = await Promise.all([
+            [animata1, animata2, animataPass] = await Promise.all([
               fetchAllForCollection(SLUG1),
               fetchAllForCollection(SLUG2),
+              fetchAllForCollection(SLUG3),
             ]);
           }
 
           res.statusCode = 200;
           res.setHeader("content-type", "application/json; charset=utf-8");
-          res.end(JSON.stringify({ address, animata1, animata2 }));
+          res.end(JSON.stringify({ address, animata1, animata2, animataPass }));
         } catch (err) {
           res.statusCode = 500;
           res.setHeader("content-type", "application/json; charset=utf-8");
