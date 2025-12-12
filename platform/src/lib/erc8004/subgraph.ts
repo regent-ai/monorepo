@@ -329,7 +329,11 @@ async function resolveMetadata(uri: string): Promise<Agent["registrationFile"]> 
       if (!base64Match) return null;
       jsonData = atob(base64Match[1]);
     } else if (uri.startsWith("http://") || uri.startsWith("https://")) {
-      const response = await fetch(uri);
+      // Avoid Mixed Content in production: browsers will block http:// fetches from https:// pages.
+      // If we detect that case, opportunistically upgrade to https:// (works for most modern hosts).
+      const safeUri = upgradeInsecureHttpForHttpsPages(uri);
+
+      const response = await fetch(safeUri);
       if (!response.ok) return null;
       jsonData = await response.text();
     } else if (uri.startsWith("ipfs://")) {
@@ -353,6 +357,30 @@ async function resolveMetadata(uri: string): Promise<Agent["registrationFile"]> 
     };
   } catch {
     return null;
+  }
+}
+
+function upgradeInsecureHttpForHttpsPages(uri: string): string {
+  try {
+    const u = new URL(uri);
+    if (u.protocol !== "http:") return uri;
+
+    // Allow local dev servers to remain http
+    const host = u.hostname.toLowerCase();
+    const isLocal =
+      host === "localhost" ||
+      host === "127.0.0.1" ||
+      host.endsWith(".localhost");
+
+    const isBrowser = typeof window !== "undefined";
+    const isHttpsPage = isBrowser && window.location.protocol === "https:";
+
+    if (!isHttpsPage || isLocal) return uri;
+
+    u.protocol = "https:";
+    return u.toString();
+  } catch {
+    return uri;
   }
 }
 
