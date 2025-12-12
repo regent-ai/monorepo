@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Trading Data Agent Template Arguments",
+  "type": "object",
+  "properties": {
+    "AGENT_DESCRIPTION": {
+      "type": "string",
+      "description": "Description of the data agent"
+    },
+    "AGENT_VERSION": {
+      "type": "string",
+      "description": "Version number for the agent",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "PAYMENTS_FACILITATOR_URL": {
+      "type": "string",
+      "format": "uri",
+      "description": "x402 facilitator URL"
+    },
+    "PAYMENTS_NETWORK": {
+      "type": "string",
+      "enum": ["base-sepolia", "base", "solana-devnet", "solana"],
+      "description": "Payment network"
+    },
+    "PAYMENTS_RECEIVABLE_ADDRESS": {
+      "type": "string",
+      "description": "Address that receives payments"
+    }
+  },
+  "required": ["AGENT_DESCRIPTION", "AGENT_VERSION"]
+}
+

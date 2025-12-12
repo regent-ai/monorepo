@@ -1,0 +1,44 @@
+{
+  "name": "@regent/analytics",
+  "version": "0.2.1",
+  "description": "Analytics and reporting for payment tracking data",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/regent-protocol/regent-sdk",
+    "directory": "packages/analytics"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsup",
+    "clean": "rm -rf dist",
+    "test": "bun test",
+    "type-check": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@regent/types": "workspace:*",
+    "viem": "catalog:"
+  },
+  "devDependencies": {
+    "@regent/x402": "workspace:*",
+    "tsup": "catalog:",
+    "typescript": "catalog:"
+  }
+}

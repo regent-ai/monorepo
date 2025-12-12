@@ -1,0 +1,265 @@
+/* JetBrains Mono for code/data */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
+/* Outfit for headings - distinctive geometric sans */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap');
+
+@import "@fontsource/geist-sans/latin.css";
+
+@import "tailwindcss" source("./");
+
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+  }
+}
+
+@theme inline {
+  --font-sans: 'Geist Sans', sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+}
+
+:root {
+  --radius: 0.625rem;
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.147 0.004 49.25);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.147 0.004 49.25);
+  --primary: oklch(0.488 0.243 264.376);
+  --primary-foreground: oklch(0.97 0.014 254.604);
+  --secondary: oklch(0.967 0.001 286.375);
+  --secondary-foreground: oklch(0.21 0.006 285.885);
+  --muted: oklch(0.97 0.001 106.424);
+  --muted-foreground: oklch(0.553 0.013 58.071);
+  --accent: oklch(0.97 0.001 106.424);
+  --accent-foreground: oklch(0.216 0.006 56.043);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.923 0.003 48.717);
+  --input: oklch(0.923 0.003 48.717);
+  --ring: oklch(0.709 0.01 56.259);
+  --chart-1: oklch(0.809 0.105 251.813);
+  --chart-2: oklch(0.623 0.214 259.815);
+  --chart-3: oklch(0.546 0.245 262.881);
+  --chart-4: oklch(0.488 0.243 264.376);
+  --chart-5: oklch(0.424 0.199 265.638);
+  --sidebar: oklch(0.985 0.001 106.423);
+  --sidebar-foreground: oklch(0.147 0.004 49.25);
+  --sidebar-primary: oklch(0.546 0.245 262.881);
+  --sidebar-primary-foreground: oklch(0.97 0.014 254.604);
+  --sidebar-accent: oklch(0.97 0.001 106.424);
+  --sidebar-accent-foreground: oklch(0.216 0.006 56.043);
+  --sidebar-border: oklch(0.923 0.003 48.717);
+  --sidebar-ring: oklch(0.709 0.01 56.259);
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.147 0.004 49.25);
+}
+
+.dark {
+  /* Deep navy-black base */
+  --background: oklch(0.147 0.004 49.25);
+  --foreground: oklch(0.985 0.001 106.423);
+  /* Elevated surfaces */
+  --card: oklch(0.216 0.006 56.043);
+  --card-foreground: oklch(0.985 0.001 106.423);
+  --popover: oklch(0.216 0.006 56.043);
+  --popover-foreground: oklch(0.985 0.001 106.423);
+  /* Cyan accent primary */
+  --primary: oklch(0.42 0.18 266);
+  --primary-foreground: oklch(0.97 0.014 254.604);
+  /* Subtle surfaces */
+  --secondary: oklch(0.274 0.006 286.033);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.268 0.007 34.298);
+  --muted-foreground: oklch(0.709 0.01 56.259);
+  --accent: oklch(0.268 0.007 34.298);
+  --accent-foreground: oklch(0.985 0.001 106.423);
+  /* Error state */
+  --destructive: oklch(0.704 0.191 22.216);
+  /* Borders and inputs */
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.553 0.013 58.071);
+  /* Chart colors - vibrant */
+  --chart-1: oklch(0.809 0.105 251.813);
+  --chart-2: oklch(0.623 0.214 259.815);
+  --chart-3: oklch(0.546 0.245 262.881);
+  --chart-4: oklch(0.488 0.243 264.376);
+  --chart-5: oklch(0.424 0.199 265.638);
+  /* Sidebar - slightly lighter than main bg */
+  --sidebar: oklch(0.216 0.006 56.043);
+  --sidebar-foreground: oklch(0.985 0.001 106.423);
+  --sidebar-primary: oklch(0.623 0.214 259.815);
+  --sidebar-primary-foreground: oklch(0.97 0.014 254.604);
+  --sidebar-accent: oklch(0.268 0.007 34.298);
+  --sidebar-accent-foreground: oklch(0.985 0.001 106.423);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.553 0.013 58.071);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    @apply font-sans bg-background text-foreground;
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+  html {
+    @apply font-sans;
+  }
+}
+
+/* Display typography: use imported Outfit for headlines without changing body font. */
+.font-display {
+  font-family: "Outfit", var(--font-sans);
+  letter-spacing: -0.02em;
+}
+
+/* -----------------------------------------------------------------------------
+  Explorer aesthetic: "Blueprint Constellation"
+
+  A light, legible surface with a vivid gradient frame and subtle circuit-glow.
+  (Fixes Safari/Chrome mask inconsistencies from the previous puzzle-border.)
+----------------------------------------------------------------------------- */
+
+.logo-border {
+  /* Fallbacks (in case color-mix isn't supported) */
+  --logo-surface: var(--card);
+  --logo-frame-a: var(--primary);
+  --logo-frame-b: var(--chart-2);
+  --logo-frame-c: var(--chart-4);
+
+  /* Preferred (modern) */
+  --logo-surface: color-mix(in oklch, var(--card) 92%, transparent);
+  --logo-frame-a: color-mix(in oklch, var(--primary) 95%, transparent);
+  --logo-frame-b: color-mix(in oklch, var(--chart-2) 95%, transparent);
+  --logo-frame-c: color-mix(in oklch, var(--chart-4) 95%, transparent);
+
+  position: relative;
+  isolation: isolate;
+  border: 1px solid transparent;
+  background:
+    linear-gradient(var(--logo-surface), var(--logo-surface)) padding-box,
+    linear-gradient(135deg, var(--logo-frame-a), var(--logo-frame-b), var(--logo-frame-c))
+      border-box;
+}
+
+/* "Circuit glow" + edge nodes, rendered UNDER content (no z-index overrides). */
+.logo-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    radial-gradient(220px 140px at 15% 10%, color-mix(in oklch, var(--primary) 22%, transparent), transparent 60%),
+    radial-gradient(260px 180px at 85% 90%, color-mix(in oklch, var(--chart-2) 18%, transparent), transparent 60%),
+    radial-gradient(circle at 50% 0%, color-mix(in oklch, var(--primary) 40%, transparent) 0 7px, transparent 8px),
+    radial-gradient(circle at 0% 50%, color-mix(in oklch, var(--chart-2) 40%, transparent) 0 7px, transparent 8px),
+    radial-gradient(circle at 100% 50%, color-mix(in oklch, var(--chart-4) 40%, transparent) 0 7px, transparent 8px),
+    radial-gradient(circle at 50% 100%, color-mix(in oklch, var(--chart-2) 35%, transparent) 0 7px, transparent 8px);
+  opacity: 0.18;
+  filter: saturate(1.15);
+  transition: opacity 180ms ease, filter 180ms ease;
+}
+
+.logo-border:hover::before {
+  opacity: 0.36;
+  filter: saturate(1.3);
+}
+
+.logo-border--ghost {
+  --logo-surface: var(--card);
+  --logo-surface: color-mix(in oklch, var(--card) 20%, transparent);
+}
+
+.logo-border--solid {
+  --logo-surface: var(--card);
+  --logo-surface: color-mix(in oklch, var(--card) 92%, transparent);
+}
+
+/* Explorer atmosphere: subtle grid + nebula glows. */
+.explorer-atmosphere {
+  position: absolute;
+  inset: -20%;
+  pointer-events: none;
+  opacity: 0.85;
+  background:
+    radial-gradient(900px 600px at 18% 22%, color-mix(in oklch, var(--primary) 14%, transparent), transparent 65%),
+    radial-gradient(760px 520px at 82% 72%, color-mix(in oklch, var(--chart-2) 12%, transparent), transparent 62%),
+    radial-gradient(700px 520px at 55% 40%, color-mix(in oklch, var(--chart-4) 10%, transparent), transparent 62%);
+  filter: saturate(1.1) contrast(1.05);
+}
+
+.explorer-atmosphere::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      color-mix(in oklch, var(--foreground) 6%, transparent) 0 1px,
+      transparent 1px 48px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      color-mix(in oklch, var(--foreground) 6%, transparent) 0 1px,
+      transparent 1px 48px
+    );
+  mask-image: radial-gradient(circle at 50% 35%, black 0 55%, transparent 80%);
+  opacity: 0.28;
+}
+
+/* Smooth transform origin for expansion */
+.agent-card {
+  transform-origin: center center;
+  will-change: transform;
+}

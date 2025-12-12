@@ -1,0 +1,73 @@
+{
+  "name": "@regent/core",
+  "version": "1.10.1",
+  "description": "Build typed agent HTTP apps",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/regent-protocol/regent-sdk",
+    "directory": "packages/core"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./utils": {
+      "types": "./dist/utils.d.ts",
+      "import": "./dist/utils.js",
+      "default": "./dist/utils.js"
+    },
+    "./axllm": {
+      "types": "./dist/axllm/index.d.ts",
+      "import": "./dist/axllm/index.js",
+      "default": "./dist/axllm/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "AGENTS.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsup",
+    "clean": "rm -rf dist",
+    "test": "bun test",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "type-check": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "zod": "catalog:",
+    "hono": "catalog:",
+    "@regent/agent-auth": "npm:@lucid-dreams/agent-auth@latest",
+    "@regent/client": "npm:@lucid-dreams/client@latest",
+    "@regent/types": "workspace:*",
+    "@regent/a2a": "workspace:*",
+    "@regent/ap2": "workspace:*",
+    "@regent/erc8004": "workspace:*",
+    "@regent/x402": "workspace:*",
+    "@regent/wallet": "workspace:*",
+    "x402-fetch": "catalog:",
+    "x402": "^0.7.1",
+    "viem": "catalog:",
+    "@ax-llm/ax": "^14.0.37",
+    "@ax-llm/ax-tools": "^14.0.37"
+  },
+  "devDependencies": {
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "@regent/eslint-config": "workspace:*",
+    "@regent/prettier-config": "workspace:*"
+  }
+}

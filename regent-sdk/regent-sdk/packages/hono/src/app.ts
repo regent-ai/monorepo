@@ -1,0 +1,137 @@
+import { Hono } from 'hono';
+import { z } from 'zod';
+import type {
+  EntrypointDef,
+  CreateAgentAppReturn,
+  AgentRuntime,
+} from '@regent/types/core';
+import { withPayments } from './paywall';
+
+export type CreateAgentAppOptions = {
+  /**
+   * Hook called before mounting agent routes.
+   * Use this to register custom middleware that should run before agent handlers.
+   */
+  beforeMount?: (app: Hono) => void;
+  /**
+   * Hook called after mounting all agent routes.
+   * Use this to register additional custom routes or error handlers.
+   */
+  afterMount?: (app: Hono) => void;
+};
+
+export async function createAgentApp(
+  runtime: AgentRuntime,
+  opts?: CreateAgentAppOptions
+): Promise<CreateAgentAppReturn<Hono, AgentRuntime, AgentRuntime['agent']>> {
+  // Require HTTP extension - runtime must have handlers
+  if (!runtime.handlers) {
+    throw new Error(
+      'HTTP extension is required. Use app.use(http()) when building the runtime.'
+    );
+  }
+  const handlers = runtime.handlers;
+  const app = new Hono();
+
+  // Allow custom middleware before agent routes
+  opts?.beforeMount?.(app);
+
+  const registerEntrypointRoutes = (entrypoint: EntrypointDef) => {
+    const invokePath = `/entrypoints/${entrypoint.key}/invoke` as const;
+    const streamPath = `/entrypoints/${entrypoint.key}/stream` as const;
+
+    withPayments({
+      app,
+      path: invokePath,
+      entrypoint,
+      kind: 'invoke',
+      payments: runtime.payments?.config,
+      runtime,
+    });
+
+    app.post(invokePath, c =>
+      handlers.invoke(c.req.raw, { key: entrypoint.key })
+    );
+
+    // Always register stream route for API consistency, even if entrypoint.stream is undefined.
+    // The runtime handler will return 400 "stream_not_supported" if streaming isn't configured.
+    // This ensures clients get a proper error (400) rather than "route not found" (404).
+    // Benefits: AI agents can optimistically try streaming without querying the manifest first,
+    // then fall back to invoke on 400. This reduces round-trips and simplifies client logic.
+    withPayments({
+      app,
+      path: streamPath,
+      entrypoint,
+      kind: 'stream',
+      payments: runtime.payments?.config,
+      runtime,
+    });
+
+    app.post(streamPath, c =>
+      handlers.stream(c.req.raw, { key: entrypoint.key })
+    );
+  };
+
+  app.get('/health', c => handlers.health(c.req.raw));
+  app.get('/entrypoints', c => handlers.entrypoints(c.req.raw));
+  app.get('/.well-known/agent.json', c => handlers.manifest(c.req.raw));
+  app.get('/.well-known/agent-card.json', c =>
+    handlers.manifest(c.req.raw)
+  );
+
+  app.get('/favicon.svg', c => handlers.favicon(c.req.raw));
+
+  // Task routes (A2A Protocol task-based operations)
+  app.post('/tasks', c => handlers.tasks(c.req.raw));
+  app.get('/tasks', c => handlers.listTasks(c.req.raw));
+  app.get('/tasks/:taskId', c =>
+    handlers.getTask(c.req.raw, { taskId: c.req.param('taskId') })
+  );
+  app.post('/tasks/:taskId/cancel', c =>
+    handlers.cancelTask(c.req.raw, { taskId: c.req.param('taskId') })
+  );
+  app.get('/tasks/:taskId/subscribe', c =>
+    handlers.subscribeTask(c.req.raw, { taskId: c.req.param('taskId') })
+  );
+
+  if (handlers.landing) {
+    app.get('/', c => handlers.landing!(c.req.raw));
+  } else {
+    app.get('/', c => c.text('Landing disabled', 404));
+  }
+
+  const addEntrypoint = <
+    TInput extends z.ZodTypeAny | undefined = z.ZodTypeAny | undefined,
+    TOutput extends z.ZodTypeAny | undefined = z.ZodTypeAny | undefined,
+  >(
+    def: EntrypointDef<TInput, TOutput>
+  ): void => {
+    runtime.entrypoints.add(def);
+    const entrypoint = runtime.entrypoints
+      .snapshot()
+      .find((item: EntrypointDef) => item.key === def.key);
+    if (!entrypoint) {
+      throw new Error(`Failed to register entrypoint "${def.key}"`);
+    }
+    registerEntrypointRoutes(entrypoint);
+  };
+
+  for (const entrypoint of runtime.entrypoints.snapshot()) {
+    registerEntrypointRoutes(entrypoint);
+  }
+
+  // Allow custom routes and handlers after agent routes
+  opts?.afterMount?.(app);
+
+  const result: CreateAgentAppReturn<
+    Hono,
+    AgentRuntime,
+    AgentRuntime['agent']
+  > = {
+    app,
+    runtime,
+    agent: runtime.agent,
+    addEntrypoint,
+  };
+  return result;
+}

@@ -1,0 +1,59 @@
+{
+  "name": "@regent/regentx",
+  "version": "0.1.0",
+  "description": "CLI for managing Regent agents on-chain",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/regent-protocol/regent-sdk",
+    "directory": "packages/regentx"
+  },
+  "type": "module",
+  "bin": {
+    "regentx": "dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "clean": "rm -rf dist",
+    "test": "bun test",
+    "dev": "bun run src/index.ts",
+    "type-check": "tsc -p tsconfig.json --noEmit"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "regent",
+    "agent",
+    "cli",
+    "blockchain",
+    "erc8004"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@regent/agents": "workspace:*",
+    "@regent/contracts": "workspace:*",
+    "@regent/erc8004": "workspace:*",
+    "@regent/wallet": "workspace:*",
+    "commander": "^12.1.0",
+    "viem": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.1",
+    "tsup": "catalog:",
+    "typescript": "catalog:"
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "name": "@regent/examples",
+  "version": "0.2.1",
+  "description": "Example implementations for regent-agents framework",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "tsup",
+    "clean": "rm -rf dist",
+    "type-check": "tsc -p tsconfig.build.json --noEmit",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "dependencies": {
+    "@ax-llm/ax": "^14.0.37",
+    "@regent/a2a": "workspace:*",
+    "@regent/analytics": "workspace:*",
+    "@regent/core": "workspace:*",
+    "@regent/hono": "workspace:*",
+    "@regent/http": "workspace:*",
+    "@regent/identity": "workspace:*",
+    "@regent/payments": "workspace:*",
+    "@regent/scheduler": "workspace:*",
+    "@regent/types": "workspace:*",
+    "@regent/wallet": "workspace:*",
+    "@regent/agent-auth": "npm:@lucid-dreams/agent-auth@latest",
+    "thirdweb": "^5.113.0",
+    "viem": "catalog:",
+    "x402": "^0.7.1",
+    "x402-fetch": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "@regent/eslint-config": "workspace:*",
+    "@regent/prettier-config": "workspace:*",
+    "bun-types": "latest"
+  }
+}

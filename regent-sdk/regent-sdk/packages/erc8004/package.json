@@ -1,0 +1,69 @@
+{
+  "name": "@regent/erc8004",
+  "version": "0.1.0",
+  "description": "ERC-8004 agent identity, discovery, and reputation SDK",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/regent-protocol/regent-sdk",
+    "directory": "packages/erc8004"
+  },
+  "scripts": {
+    "codegen": "graphql-codegen --config codegen.yml",
+    "prebuild": "bun run codegen",
+    "build": "tsup",
+    "clean": "rm -rf dist",
+    "test": "bun test --timeout 120000",
+    "test:coverage": "bun test --timeout 120000 --coverage",
+    "type-check": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "keywords": [
+    "erc-8004",
+    "agent",
+    "blockchain",
+    "ethereum",
+    "ipfs",
+    "reputation",
+    "regent"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@regent/types": "workspace:*",
+    "viem": "catalog:",
+    "graphql-request": "catalog:",
+    "ipfs-http-client": "^60.0.1",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "@graphql-codegen/cli": "^6.0.1",
+    "@graphql-codegen/introspection": "^5.0.0",
+    "@graphql-codegen/typescript": "^5.0.2",
+    "@graphql-codegen/typescript-operations": "^5.0.2",
+    "@regent/eslint-config": "workspace:*",
+    "@regent/prettier-config": "workspace:*"
+  }
+}

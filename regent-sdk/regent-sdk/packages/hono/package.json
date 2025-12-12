@@ -1,0 +1,51 @@
+{
+  "name": "@regent/hono",
+  "version": "0.7.5",
+  "description": "Hono adapter for Regent agent runtime",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/regent-protocol/regent-sdk",
+    "directory": "packages/hono"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsup",
+    "clean": "rm -rf dist",
+    "test": "bun test",
+    "type-check": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@regent/ap2": "workspace:*",
+    "@regent/core": "workspace:*",
+    "@regent/x402": "workspace:*",
+    "@regent/types": "workspace:*",
+    "hono": "catalog:",
+    "x402-hono": "^0.7.1",
+    "x402": "^0.7.1",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@regent/http": "workspace:*",
+    "@regent/wallet": "workspace:*",
+    "tsup": "catalog:",
+    "typescript": "catalog:"
+  }
+}

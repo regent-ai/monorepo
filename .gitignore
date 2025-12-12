@@ -1,0 +1,19 @@
+
+# Upstream mirrors kept as separate repos (not tracked by this monorepo)
+regent-sdk/lucid-agents/
+regent-sdk/agent0-ts/
+regent-sdk/upstream-sync.json
+regent-sdk/upstream-report.ts
+
+# GitBook docs repo (tracked separately)
+documentation/
+
+#archived projects not for public consumption
+animata-drop-save
+fleet-dashboard
+teaser-web
+
+#not ready for release yet
+chatgpt-app
+agents
+

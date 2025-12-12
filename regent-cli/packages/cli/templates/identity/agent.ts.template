@@ -1,0 +1,151 @@
+{{TEMPLATE_IMPORTS}}
+import { createAgent } from "@regent/core";
+import { http } from "@regent/http";
+import { wallets } from "@regent/wallet";
+import { walletsFromEnv } from "@regent/wallet";
+import { identity, identityFromEnv } from "@regent/erc8004";
+import { createAgentIdentity, getTrustConfig, generateAgentMetadata } from "@regent/erc8004";
+
+{{TEMPLATE_PRE_SETUP}}
+const agent = await createAgent({
+  name: process.env.AGENT_NAME ?? "my-agent",
+  version: process.env.AGENT_VERSION ?? "0.1.0",
+  description: process.env.AGENT_DESCRIPTION,
+})
+  .use(http())
+  .use(wallets({ config: walletsFromEnv() }))
+  .use(identity({
+    config: {
+      ...identityFromEnv(),
+      autoRegister: process.env.REGISTER_IDENTITY === "true",
+    }
+  }))
+  .build();
+
+{{TEMPLATE_POST_SETUP}}
+// Identity feature setup
+// Note: The identity extension has already been configured above
+// This section creates the on-chain identity using the agent's wallets
+const identityResult = await createAgentIdentity({
+  runtime: agent,
+  domain: process.env.AGENT_DOMAIN,
+  autoRegister: process.env.REGISTER_IDENTITY === "true",
+  rpcUrl: process.env.RPC_URL,
+  chainId: process.env.CHAIN_ID ? parseInt(process.env.CHAIN_ID) : undefined,
+});
+
+if (identityResult.didRegister) {
+  console.log("Registered agent on-chain!");
+  console.log("Transaction:", identityResult.transactionHash);
+
+  // IMPORTANT: After registration, you MUST host the ERC-8004 metadata at the tokenURI
+  // The tokenURI points to: https://{domain}/.well-known/agent-metadata.json
+  // This metadata is what gets stored on-chain and allows others to verify your agent's identity
+  const metadata = generateAgentMetadata(identityResult, {
+    name: process.env.AGENT_NAME,
+    description: process.env.AGENT_DESCRIPTION,
+  });
+
+  console.log("\n⚠️  IMPORTANT: Host this metadata at:");
+  console.log(`   https://${identityResult.domain}/.well-known/agent-metadata.json\n`);
+  console.log(JSON.stringify(metadata, null, 2));
+  console.log("\nWhy? The ERC-8004 registry stores this URL as the tokenURI.");
+  console.log("Anyone querying the registry will fetch this metadata to verify your agent's identity.");
+  console.log("Without hosting this file, your agent's on-chain identity cannot be verified.\n");
+} else if (identityResult.trust) {
+  console.log("Found existing registration");
+  console.log("Agent ID:", identityResult.record?.agentId);
+
+  // Even if already registered, verify metadata is hosted
+  if (identityResult.record?.tokenURI) {
+    console.log("Token URI:", identityResult.record.tokenURI);
+    console.log("Ensure metadata is hosted at the tokenURI location.");
+  }
+}
+
+const trustConfig = getTrustConfig(identityResult);
+
+// Example: Query validation summary (read operation)
+// This demonstrates that the validation client is configured with the agent wallet
+if (identityResult.clients?.validation && identityResult.record?.agentId) {
+  console.log(
+    "Fetching validation summary for agent ID:",
+    identityResult.record.agentId.toString()
+  );
+  try {
+    const summary = await identityResult.clients.validation.getSummary(
+      identityResult.record.agentId
+    );
+    console.log("Validation summary:", {
+      count: summary.count.toString(),
+      averageResponse: summary.avgResponse,
+    });
+  } catch (error) {
+    console.warn("Could not fetch validation summary:", error);
+  }
+} else {
+  console.log("Validation client or agent ID not available:", {
+    hasValidationClient: !!identityResult.clients?.validation,
+    hasAgentId: !!identityResult.record?.agentId,
+  });
+}
+
+// Example: Create validation request (write operation using agent wallet)
+// This demonstrates write operations with the agent's private key
+//
+// IMPORTANT: The validatorAddress must be the address of a validator contract that will validate the request.
+// This is typically a validator smart contract (e.g., stake-secured inference re-execution,
+// zkML verifier, or TEE oracle). The validator will later respond with validationResponse.
+//
+// The agent (owner of agentId) calls this to request validation from a validator.
+// The validator address should NOT be the agent's own address - it should be a separate validator.
+//
+// Note: This example uses a placeholder validator address for demonstration.
+// In production, replace this with the actual validator contract address.
+if (identityResult.clients?.validation && identityResult.record?.agentId) {
+  try {
+    const agentId = identityResult.record.agentId;
+
+    // Placeholder validator address (replace with actual validator contract address in production)
+    const validatorAddress =
+      "0x0000000000000000000000000000000000000001" as const;
+
+    // URI pointing to the validation request content (e.g., IPFS hash)
+    const timestamp = Date.now();
+    const requestUri = `https://${
+      process.env.AGENT_DOMAIN || "agent.example.com"
+    }/validation-request-${timestamp}.json`;
+
+    console.log("Creating validation request...");
+    console.log("Validator address:", validatorAddress);
+    console.log("Agent ID:", agentId.toString());
+    console.log("Request URI:", requestUri);
+
+    // requestHash will be computed automatically from requestUri
+    const txHash = await identityResult.clients.validation.createRequest({
+      validatorAddress,
+      agentId,
+      requestUri,
+    });
+    console.log("Created validation request! Transaction:", txHash);
+    console.log(
+      "Note: The validator at",
+      validatorAddress,
+      "should respond with validationResponse"
+    );
+  } catch (error: any) {
+    console.error("Could not create validation request:", error);
+    if (error?.message) {
+      console.error("Error message:", error.message);
+    }
+    if (error?.reason) {
+      console.error("Error reason:", error.reason);
+    }
+  }
+}
+
+// Export identity feature clients
+export const identityClient = identityResult.clients?.identity;
+export const reputationClient = identityResult.clients?.reputation;
+export const validationClient = identityResult.clients?.validation;
+

@@ -1,0 +1,7 @@
+.DS_Store
+
+# Preserved upstream mirrors (separate git repos; intentionally not tracked by the top-level monorepo)
+lucid-agents/
+agent0-ts/
+
+

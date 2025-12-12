@@ -1,0 +1,59 @@
+{
+  "name": "@regent/root",
+  "private": true,
+  "workspaces": {
+    "packages": [
+      "packages/*"
+    ],
+    "catalog": {
+      "zod": "^4.1.12",
+      "typescript": "^5.9.2",
+      "@ax-llm/ax": "^14.0.31",
+      "hono": "4.10.1",
+      "express": "^4.19.2",
+      "viem": "^2.41.2",
+      "x402": "latest",
+      "x402-fetch": "latest",
+      "tsup": "^8.5.0",
+      "graphql-request": "^6.1.0"
+    }
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "scripts": {
+    "build": "bun run scripts/build-packages.ts",
+    "build:clean": "bun run scripts/build-packages.ts --clean",
+    "build:packages": "bun run scripts/build-packages.ts",
+    "test": "bun run --filter='./packages/*' test",
+    "test:coverage": "bun run --filter='./packages/*' test:coverage",
+    "changeset": "bunx changeset",
+    "release:version": "bunx changeset version",
+    "release:publish": "bun run scripts/build-packages.ts && bun run scripts/changeset-publish.ts",
+    "release": "bun run release:version && bun run release:publish",
+    "lint": "bun run --filter='./packages/*' lint",
+    "lint:fix": "bun run --filter='./packages/*' lint:fix",
+    "format": "bun run --filter='./packages/*' format",
+    "format:check": "bun run --filter='./packages/*' format:check",
+    "type-check": "bun run --filter='./packages/*' type-check",
+    "prepare": "husky"
+  },
+  "dependencies": {
+    "@types/bun": "^1.2.21",
+    "@types/node": "^24.3.1",
+    "tsup": "catalog:",
+    "typescript": "catalog:"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.27.9",
+    "eslint": "^8.57.1",
+    "@typescript-eslint/eslint-plugin": "^8.39.1",
+    "@typescript-eslint/parser": "^8.39.1",
+    "eslint-config-prettier": "^10.0.0",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "eslint-plugin-unused-imports": "^4.1.4",
+    "prettier": "^3.0.0",
+    "husky": "^9.1.7"
+  }
+}

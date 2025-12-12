@@ -1,0 +1,89 @@
+{
+  "id": "identity",
+  "name": "Agent with ERC-8004 Identity",
+  "description": "Full-featured agent with ERC-8004 identity registration, payments, and trust metadata.",
+  "adapters": ["hono", "express", "tanstack-ui", "tanstack-headless", "next"],
+  "package": {
+    "dependencies": {
+      "@regent/identity": "latest",
+      "@regent/wallet": "latest",
+      "viem": "^2.41.2"
+    }
+  },
+  "wizard": {
+    "prompts": [
+      {
+        "key": "AGENT_DESCRIPTION",
+        "type": "input",
+        "message": "How would you describe your agent?",
+        "defaultValue": "Verifiable agent with on-chain identity"
+      },
+      {
+        "key": "AGENT_VERSION",
+        "type": "input",
+        "message": "What version should the agent start at?",
+        "defaultValue": "0.1.0"
+      },
+      {
+        "key": "AGENT_DOMAIN",
+        "type": "input",
+        "message": "What domain will host your agent?",
+        "defaultValue": "agent.example.com"
+      },
+      {
+        "key": "PAYMENTS_FACILITATOR_URL",
+        "type": "input",
+        "message": "Facilitator URL",
+        "defaultValue": "https://facilitator.regent.cx"
+      },
+      {
+        "key": "PAYMENTS_NETWORK",
+        "type": "select",
+        "message": "Payment network",
+        "choices": [
+          { "value": "base-sepolia", "title": "Base Sepolia (EVM testnet)" },
+          { "value": "base", "title": "Base (EVM mainnet)" },
+          { "value": "solana-devnet", "title": "Solana Devnet" },
+          { "value": "solana", "title": "Solana Mainnet" }
+        ],
+        "defaultValue": "base-sepolia"
+      },
+      {
+        "key": "PAYMENTS_RECEIVABLE_ADDRESS",
+        "type": "input",
+        "message": "Payment address (0x... for EVM, Base58 for Solana)",
+        "defaultValue": ""
+      },
+      {
+        "key": "RPC_URL",
+        "type": "input",
+        "message": "RPC URL (blockchain endpoint)",
+        "defaultValue": "https://sepolia.base.org"
+      },
+      {
+        "key": "CHAIN_ID",
+        "type": "input",
+        "message": "Chain ID",
+        "defaultValue": "84532"
+      },
+      {
+        "key": "IDENTITY_AUTO_REGISTER",
+        "type": "confirm",
+        "message": "Auto-register on ERC-8004 registry?",
+        "defaultValue": true
+      },
+      {
+        "key": "AGENT_WALLET_PRIVATE_KEY",
+        "type": "input",
+        "message": "Agent wallet private key (required for identity registration)",
+        "defaultValue": ""
+      },
+      {
+        "key": "DEVELOPER_WALLET_PRIVATE_KEY",
+        "type": "input",
+        "message": "Developer wallet private key (optional, for contract interactions)",
+        "defaultValue": ""
+      }
+    ]
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "name": "@regent/x402",
+  "version": "1.10.1",
+  "description": "Payment logic for bidirectional agent-to-agent payments",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/regent-protocol/regent-sdk",
+    "directory": "packages/payments"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsup",
+    "clean": "rm -rf dist",
+    "type-check": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@ax-llm/ax": "catalog:",
+    "@regent/types": "workspace:*",
+    "x402-fetch": "catalog:",
+    "x402": "^0.7.1",
+    "viem": "catalog:",
+    "zod": "catalog:",
+    "better-sqlite3": "^11.7.0",
+    "pg": "^8.13.1"
+  },
+  "devDependencies": {
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/pg": "^8.11.10"
+  }
+}

@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.env
+*.log
+.DS_Store
+
+data/
+
+lib/
+out/
+cache/
+foundry.lock
+
