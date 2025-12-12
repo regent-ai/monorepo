@@ -5,9 +5,6 @@ regent-sdk/agent0-ts/
 regent-sdk/upstream-sync.json
 regent-sdk/upstream-report.ts
 
-# GitBook docs repo (tracked separately)
-documentation/
-
 #archived projects not for public consumption
 animata-drop-save
 fleet-dashboard
