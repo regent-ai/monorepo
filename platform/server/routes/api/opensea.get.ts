@@ -14,6 +14,7 @@ interface OpenSeaResponse {
 
 const SLUG1 = "animata";
 const SLUG2 = "regent-animata-ii";
+const SLUG3 = "animata-pass";
 
 export default defineEventHandler(async (event) => {
   try {
@@ -86,15 +87,19 @@ export default defineEventHandler(async (event) => {
 
     let animata1: number[] = [];
     let animata2: number[] = [];
+    let animataPass: number[] = [];
 
     if (collection === SLUG1) {
       animata1 = await fetchAllForCollection(SLUG1);
     } else if (collection === SLUG2) {
       animata2 = await fetchAllForCollection(SLUG2);
+    } else if (collection === SLUG3) {
+      animataPass = await fetchAllForCollection(SLUG3);
     } else {
-      [animata1, animata2] = await Promise.all([
+      [animata1, animata2, animataPass] = await Promise.all([
         fetchAllForCollection(SLUG1),
         fetchAllForCollection(SLUG2),
+        fetchAllForCollection(SLUG3),
       ]);
     }
 
@@ -102,6 +107,7 @@ export default defineEventHandler(async (event) => {
       address,
       animata1,
       animata2,
+      animataPass,
     };
   } catch (err: any) {
     if (err.statusCode) {
