@@ -71,7 +71,7 @@ export function DashboardHeader() {
       <ThemeToggle />
 
       <Button variant="ghost" size="icon" className="hidden sm:flex" asChild>
-        <a href="/docs">
+        <a href="https://docs.regent.cx" target="_blank" rel="noopener noreferrer">
           <ExternalLink className="size-5" />
           <span className="sr-only">Documentation</span>
         </a>
@@ -98,7 +98,7 @@ export function DashboardHeader() {
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <a href="/docs">
+            <a href="https://docs.regent.cx" target="_blank" rel="noopener noreferrer">
               <ExternalLink className="mr-2 size-4" />
               Docs
             </a>

@@ -198,7 +198,9 @@ export function DashboardSidebar() {
             <SidebarMenuItem>
               <SidebarMenuButton asChild tooltip="Documentation">
                 <a
-                  href="/docs"
+                  href="https://docs.regent.cx"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   onClick={closeMobileSidebar}
                   className="text-muted-foreground hover:text-foreground"
                 >

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { ExternalLink, Loader2 } from "lucide-react";
 import { base } from "viem/chains";
 import {
@@ -32,6 +32,7 @@ import {
 } from "@/lib/permit2";
 import { env } from "~/env/client";
 import { setWalletState, useWalletStore } from "@/lib/wallet-store";
+import { cn } from "~/lib/utils";
 
 interface RedeemWidgetProps {
   variant?: "full" | "simple";
@@ -135,9 +136,6 @@ export function RedeemWidget({ variant = "simple" }: RedeemWidgetProps) {
   const [remaining, setRemaining] = React.useState<bigint | null>(null);
   const [nftApproved, setNftApproved] = React.useState<boolean>(false);
   const [usdcAllowanceOk, setUsdcAllowanceOk] = React.useState<boolean>(false);
-  const [usdcBalanceOk, setUsdcBalanceOk] = React.useState<boolean>(false);
-  const [c3Available, setC3Available] = React.useState<boolean>(false);
-  const [regentFunded, setRegentFunded] = React.useState<boolean>(false);
   const [ownsSelectedToken, setOwnsSelectedToken] = React.useState<
     boolean | null
   >(null);
@@ -385,66 +383,6 @@ export function RedeemWidget({ variant = "simple" }: RedeemWidgetProps) {
     }
   }
 
-  async function runPrechecks() {
-    if (!redeemerAddress || !account) return;
-    try {
-      const tid = /^\d+$/.test(tokenId) ? BigInt(tokenId) : BigInt(0);
-      const newId = source === "ANIMATA1" ? tid : tid + BigInt(999);
-      const [ownerC3, regentBal, usdcBal, allowance, approved] =
-        await Promise.all([
-          tid >= BigInt(1) && tid <= BigInt(999)
-            ? publicClient
-                .readContract({
-                  address: COLLECTION3,
-                  abi: [
-                    {
-                      type: "function",
-                      name: "ownerOf",
-                      stateMutability: "view",
-                      inputs: [{ name: "tokenId", type: "uint256" }],
-                      outputs: [{ name: "", type: "address" }],
-                    },
-                  ] as const,
-                  functionName: "ownerOf",
-                  args: [newId],
-                })
-                .catch(() => null)
-            : Promise.resolve(null),
-          publicClient.readContract({
-            address: REGENT,
-            abi: erc20Abi,
-            functionName: "balanceOf",
-            args: [redeemerAddress],
-          }),
-          publicClient.readContract({
-            address: USDC,
-            abi: erc20Abi,
-            functionName: "balanceOf",
-            args: [account],
-          }),
-          publicClient.readContract({
-            address: USDC,
-            abi: erc20Abi,
-            functionName: "allowance",
-            args: [account, redeemerAddress],
-          }),
-          publicClient.readContract({
-            address: getSourceAddress(source),
-            abi: erc721Abi,
-            functionName: "isApprovedForAll",
-            args: [account, redeemerAddress],
-          }),
-        ]);
-      setC3Available(
-        ownerC3?.toString().toLowerCase() === redeemerAddress.toLowerCase()
-      );
-      setRegentFunded((regentBal as bigint) >= REGENT_PAYOUT);
-      setUsdcBalanceOk((usdcBal as bigint) >= USDC_PRICE);
-      setUsdcAllowanceOk((allowance as bigint) >= USDC_PRICE);
-      setNftApproved(approved as boolean);
-    } catch {}
-  }
-
   async function refreshClaimable() {
     const acc = account ?? sharedWallet.account;
     if (!redeemerAddress || !acc) return;
@@ -649,11 +587,6 @@ export function RedeemWidget({ variant = "simple" }: RedeemWidgetProps) {
     if (!connected) return;
     void fetchAccessPassHoldings();
   }, [sharedWallet.account]);
-
-  React.useEffect(() => {
-    if (!account && !sharedWallet.account) return;
-    void runPrechecks();
-  }, [account, sharedWallet.account, source, tokenId]);
 
   React.useEffect(() => {
     const acc = sharedWallet.account ?? account;
@@ -943,70 +876,6 @@ export function RedeemWidget({ variant = "simple" }: RedeemWidgetProps) {
         </div>
       )}
 
-      {/* Pre-checks */}
-      {connectedAccount && (
-        <div className="rounded-xl border border-border/50 bg-card/50 p-5 backdrop-blur-sm">
-          <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-sm font-semibold">Pre-checks</h3>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={runPrechecks}
-              disabled={status !== "idle"}
-            >
-              Refresh
-            </Button>
-          </div>
-          <div className="grid grid-cols-2 gap-2 text-sm sm:grid-cols-3">
-            <div
-              className={
-                c3Available
-                  ? "text-chart-2"
-                  : "text-muted-foreground"
-              }
-            >
-              C3 ID available
-            </div>
-            <div
-              className={
-                regentFunded
-                  ? "text-chart-2"
-                  : "text-muted-foreground"
-              }
-            >
-              REGENT funded
-            </div>
-            <div
-              className={
-                usdcBalanceOk
-                  ? "text-chart-2"
-                  : "text-muted-foreground"
-              }
-            >
-              USDC balance OK
-            </div>
-            <div
-              className={
-                usdcAllowanceOk
-                  ? "text-chart-2"
-                  : "text-muted-foreground"
-              }
-            >
-              USDC allowance OK
-            </div>
-            <div
-              className={
-                nftApproved
-                  ? "text-chart-2"
-                  : "text-muted-foreground"
-              }
-            >
-              NFT approved
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Regent Animata Access Pass (separate collection, no redeem logic) */}
       {connectedAccount && (
         <div className="rounded-xl border border-border/50 bg-card/50 p-5 backdrop-blur-sm">
@@ -1037,15 +906,14 @@ export function RedeemWidget({ variant = "simple" }: RedeemWidgetProps) {
                   "Refresh"
                 )}
               </Button>
-              <Button variant="ghost" size="sm" asChild>
-                <a
-                  href="https://opensea.io/collection/animata-pass"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  OpenSea <ExternalLink className="ml-2 size-4" />
-                </a>
-              </Button>
+              <a
+                href="https://opensea.io/collection/animata-pass"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={cn(buttonVariants({ variant: "ghost", size: "sm" }))}
+              >
+                OpenSea <ExternalLink className="ml-2 size-4" />
+              </a>
             </div>
           </div>
 

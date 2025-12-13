@@ -63,3 +63,4 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 - [Farcaster](https://farcaster.xyz/regent)
 - [Telegram](https://t.me/+pJHTcXBj3yxmZmEx)
 - [GitHub](https://github.com/regent-ai)
+- [Discord](https://discord.gg/regents)

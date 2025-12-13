@@ -10,6 +10,7 @@ import {
   Filter,
   Globe,
   LayoutGrid,
+  Loader2,
   List,
   MessageSquare,
   Search,
@@ -110,18 +111,12 @@ const explorerSearchSchema: z.ZodType<ExplorerSearchState> = z.object({
 
 export const Route = createFileRoute("/explorer")({
   validateSearch: (search) => explorerSearchSchema.parse(search),
-  loader: async () => {
-    const [agents, stats] = await Promise.all([
-      fetchAgents(GRID_INITIAL_BATCH_SIZE, 0),
-      fetchGlobalStats(),
-    ]);
-    return { agents, stats };
-  },
   component: ExplorerPage,
 });
 
+type GlobalStats = Awaited<ReturnType<typeof fetchGlobalStats>>;
+
 function ExplorerPage() {
-  const { agents: initialAgents, stats } = Route.useLoaderData();
   const searchState = Route.useSearch();
   const navigate = Route.useNavigate();
 
@@ -138,7 +133,10 @@ function ExplorerPage() {
 
   const gridRef = useRef<ThiingsGrid | null>(null);
   const atmosphereRef = useRef<HTMLDivElement | null>(null);
-  const [agents, setAgents] = useState<Agent[]>(initialAgents);
+  const [agents, setAgents] = useState<Agent[]>([]);
+  const [stats, setStats] = useState<GlobalStats | null>(null);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [initialLoadError, setInitialLoadError] = useState<string | null>(null);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [loadMoreError, setLoadMoreError] = useState<string | null>(null);
@@ -154,9 +152,31 @@ function ExplorerPage() {
   agentsRef.current = agents;
   isLoadingMoreRef.current = isLoadingMore;
 
+  const loadInitial = useCallback(async () => {
+    setIsInitialLoading(true);
+    setInitialLoadError(null);
+
+    try {
+      const [nextAgents, nextStats] = await Promise.all([
+        fetchAgents(GRID_INITIAL_BATCH_SIZE, 0),
+        fetchGlobalStats(),
+      ]);
+      setAgents(nextAgents);
+      setStats(nextStats);
+    } catch (e) {
+      setAgents([]);
+      setStats(null);
+      setInitialLoadError(
+        e instanceof Error ? e.message : "Failed to load Explorer data"
+      );
+    } finally {
+      setIsInitialLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
-    setAgents(initialAgents);
-  }, [initialAgents]);
+    void loadInitial();
+  }, [loadInitial]);
 
   const [searchDraft, setSearchDraft] = useState(explorerSearch.search);
   useEffect(() => {
@@ -197,11 +217,14 @@ function ExplorerPage() {
   }, [agents]);
 
   const totalAgentsGlobal = useMemo(() => {
-    const n = Number(stats.totalAgents);
-    return Number.isFinite(n) ? n : agents.length;
-  }, [agents.length, stats.totalAgents]);
+    const n = stats ? Number(stats.totalAgents) : Number.NaN;
+    if (Number.isFinite(n) && n > 0) return n;
+    // While stats are loading (or if they fail), assume at least the initial batch size
+    // so the UI doesn't think "0 total agents" and stop loading.
+    return Math.max(GRID_INITIAL_BATCH_SIZE, agents.length);
+  }, [agents.length, stats]);
 
-  const hasLoadedAll = agents.length >= totalAgentsGlobal;
+  const hasLoadedAll = !!stats && agents.length >= totalAgentsGlobal;
 
   const processedAgents = useMemo(() => {
     let result = [...agents];
@@ -262,6 +285,7 @@ function ExplorerPage() {
     explorerSearch.search || explorerSearch.hasReviews || explorerSearch.hasEndpoint;
 
   const loadMoreAgents = useCallback(async () => {
+    if (isInitialLoading) return;
     if (isLoadingMoreRef.current) return;
     if (agentsRef.current.length >= totalAgentsGlobal) return;
 
@@ -290,7 +314,7 @@ function ExplorerPage() {
       isLoadingMoreRef.current = false;
       setIsLoadingMore(false);
     }
-  }, [totalAgentsGlobal]);
+  }, [isInitialLoading, totalAgentsGlobal]);
 
   const openPreview = useCallback((agent: Agent) => {
     setSelectedAgent(agent);
@@ -420,6 +444,7 @@ function ExplorerPage() {
 
       if (explorerSearch.mode === "regent") return;
       if (explorerSearch.view !== "grid") return;
+      if (isInitialLoading) return;
       if (hasLoadedAll) return;
 
       const target = maxIndex + GRID_PREFETCH_THRESHOLD;
@@ -438,11 +463,12 @@ function ExplorerPage() {
       if (isFarFromLoaded) setIsFarFromLoaded(false);
       void loadMoreAgents();
     },
-    [hasLoadedAll, isFarFromLoaded, loadMoreAgents, explorerSearch.view]
+    [hasLoadedAll, isFarFromLoaded, isInitialLoading, loadMoreAgents, explorerSearch.view]
   );
 
   useEffect(() => {
     if (explorerSearch.view !== "list") return;
+    if (isInitialLoading) return;
     if (hasLoadedAll) return;
 
     const needed = explorerSearch.page * explorerSearch.perPage;
@@ -453,6 +479,7 @@ function ExplorerPage() {
     explorerSearch.page,
     explorerSearch.perPage,
     explorerSearch.view,
+    isInitialLoading,
     hasLoadedAll,
     loadMoreAgents,
     processedAgents.length,
@@ -641,19 +668,39 @@ function ExplorerPage() {
 
           {pageAgents.length === 0 && (
             <div className="mt-8 flex flex-col items-center justify-center rounded-2xl border border-border/50 bg-card/30 py-16 text-center">
-              <Search className="mb-4 h-12 w-12 text-muted-foreground/50" />
-              <p className="text-lg font-medium">No agents on this page</p>
+              {isInitialLoading ? (
+                <Loader2 className="mb-4 h-12 w-12 animate-spin text-muted-foreground/50" />
+              ) : (
+                <Search className="mb-4 h-12 w-12 text-muted-foreground/50" />
+              )}
+              <p className="text-lg font-medium">
+                {isInitialLoading
+                  ? "Loading agents…"
+                  : initialLoadError
+                    ? "Explorer failed to load"
+                    : "No agents on this page"}
+              </p>
               <p className="mt-1 text-sm text-muted-foreground">
-                Try adjusting your filters or loading more agents.
+                {isInitialLoading
+                  ? "Fetching the ERC-8004 registry. This can take a moment on a cold cache."
+                  : initialLoadError
+                    ? initialLoadError
+                    : "Try adjusting your filters or loading more agents."}
               </p>
               <div className="mt-4 flex gap-2">
-                <Button variant="outline" onClick={clearFilters}>
-                  Clear filters
-                </Button>
-                {!hasLoadedAll && (
-                  <Button onClick={() => void loadMoreAgents()} disabled={isLoadingMore}>
-                    {isLoadingMore ? "Loading..." : "Load more"}
-                  </Button>
+                {initialLoadError ? (
+                  <Button onClick={() => void loadInitial()}>Retry</Button>
+                ) : (
+                  <>
+                    <Button variant="outline" onClick={clearFilters}>
+                      Clear filters
+                    </Button>
+                    {!hasLoadedAll && (
+                      <Button onClick={() => void loadMoreAgents()} disabled={isLoadingMore}>
+                        {isLoadingMore ? "Loading..." : "Load more"}
+                      </Button>
+                    )}
+                  </>
                 )}
               </div>
             </div>
@@ -710,18 +757,34 @@ function ExplorerPage() {
         <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
           <div className="pointer-events-auto flex flex-col items-center rounded-2xl border border-border/50 bg-card/90 p-8 text-center backdrop-blur-sm">
             <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-muted">
-              <Search className="h-8 w-8 text-muted-foreground" />
+              {isInitialLoading ? (
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+              ) : (
+                <Search className="h-8 w-8 text-muted-foreground" />
+              )}
             </div>
             <p className="text-lg font-medium">
-              {explorerSearch.mode === "regent" ? "No Regent agents yet" : "No agents found"}
+              {isInitialLoading
+                ? "Loading agents…"
+                : initialLoadError
+                  ? "Explorer failed to load"
+                  : explorerSearch.mode === "regent"
+                    ? "No Regent agents yet"
+                    : "No agents found"}
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
-              {explorerSearch.mode === "regent"
-                ? "Regent agents will appear here once you deploy. Switch to All to browse ERC-8004."
-                : "Try adjusting your search or filters"}
+              {isInitialLoading
+                ? "Fetching the ERC-8004 registry. This can take a moment on a cold cache."
+                : initialLoadError
+                  ? initialLoadError
+                  : explorerSearch.mode === "regent"
+                    ? "Regent agents will appear here once you deploy. Switch to All to browse ERC-8004."
+                    : "Try adjusting your search or filters"}
             </p>
             <div className="mt-4 flex items-center gap-2">
-              {explorerSearch.mode === "regent" ? (
+              {initialLoadError ? (
+                <Button onClick={() => void loadInitial()}>Retry</Button>
+              ) : explorerSearch.mode === "regent" ? (
                 <Button onClick={() => setMode("all")}>Switch to All</Button>
               ) : (
                 <>
@@ -746,7 +809,7 @@ function ExplorerPage() {
           {totalAgentsGlobal.toLocaleString()} • Showing{" "}
           {processedAgents.length.toLocaleString()}
           {hasActiveFilters ? " (filtered)" : ""} •{" "}
-          {parseInt(stats.totalFeedback).toLocaleString()} reviews
+          {stats ? parseInt(stats.totalFeedback).toLocaleString() : "…"} reviews
           {isLoadingMore ? " • Loading…" : ""}
         </div>
 

@@ -1,12 +1,12 @@
 import { defineNitroConfig } from "nitro/config";
 
-const GITBOOK_PROXY_BASE = "https://proxy.gitbook.site/sites/site_4BMeH";
+const DOCS_URL = "https://docs.regent.cx";
 
 export default defineNitroConfig({
   routeRules: {
-    // Serve GitBook docs under /docs on all deployments (Vercel build output routes everything to SSR).
-    "/docs": { proxy: GITBOOK_PROXY_BASE },
-    "/docs/**": { proxy: `${GITBOOK_PROXY_BASE}/**` },
+    // Canonical docs live on the docs subdomain; keep /docs working for bookmarks.
+    "/docs": { redirect: DOCS_URL },
+    "/docs/**": { redirect: `${DOCS_URL}/**` },
   },
 });
 

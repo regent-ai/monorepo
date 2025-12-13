@@ -42,7 +42,7 @@ Regent is building the infrastructure for agents to:
 - **`/explorer`**: ERC-8004 agent explorer (directory)
 - **`/agent/:id`**: agent detail page
 - **`/redeem`**: Animata → `$REGENT` redemption flow
-- **`/docs`**: documentation entrypoint
+- **Docs**: [`https://docs.regent.cx`](https://docs.regent.cx) (canonical; `/docs` redirects)
 
 ### Documented / planned
 

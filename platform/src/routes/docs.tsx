@@ -16,7 +16,7 @@ function DocsRoute() {
       <header className="space-y-2">
         <h1 className="text-2xl font-semibold tracking-tight">Docs</h1>
         <p className="text-sm text-muted-foreground">
-          Regent documentation lives on the GitBook site.
+          Regent documentation lives at {DOCS_URL}.
         </p>
       </header>
 
