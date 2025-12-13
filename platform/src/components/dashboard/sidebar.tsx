@@ -103,7 +103,7 @@ export function DashboardSidebar() {
   }
 
   return (
-    <Sidebar collapsible="offcanvas">
+    <Sidebar collapsible="none">
       <SidebarHeader className="p-4">
         <Link
           to="/"

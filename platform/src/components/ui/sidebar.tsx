@@ -169,21 +169,6 @@ const Sidebar = React.forwardRef<
   ) => {
     const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
 
-    if (collapsible === "none") {
-      return (
-        <div
-          className={cn(
-            "flex h-full w-[--sidebar-width] flex-col bg-sidebar text-sidebar-foreground",
-            className
-          )}
-          ref={ref}
-          {...props}
-        >
-          {children}
-        </div>
-      );
-    }
-
     // Mobile: render a "push" sidebar (no overlap with main content).
     // We keep the hamburger trigger behavior (openMobile), but avoid an overlay sheet.
     if (isMobile) {
@@ -206,6 +191,22 @@ const Sidebar = React.forwardRef<
           {...props}
         >
           <div className="flex h-full w-full flex-col">{children}</div>
+        </div>
+      );
+    }
+
+    // Desktop: if we don't want collapsing, render an in-flow sidebar (no fixed positioning / no overlap).
+    if (collapsible === "none") {
+      return (
+        <div
+          className={cn(
+            "flex h-svh w-[--sidebar-width] shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground",
+            className
+          )}
+          ref={ref}
+          {...props}
+        >
+          {children}
         </div>
       );
     }
