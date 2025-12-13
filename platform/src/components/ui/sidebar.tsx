@@ -10,13 +10,6 @@ import { cn } from "~/lib/utils";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Separator } from "~/components/ui/separator";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "~/components/ui/sheet";
 import { Skeleton } from "~/components/ui/skeleton";
 import {
   Tooltip,
@@ -191,34 +184,36 @@ const Sidebar = React.forwardRef<
       );
     }
 
+    // Mobile: render a "push" sidebar (no overlap with main content).
+    // We keep the hamburger trigger behavior (openMobile), but avoid an overlay sheet.
     if (isMobile) {
+      const mobileWidth = "min(18rem, 85vw)";
       return (
-        <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
-          <SheetContent
-            data-sidebar="sidebar"
-            data-mobile="true"
-            className="w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
-            style={
-              {
-                "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
-              } as React.CSSProperties
-            }
-            side={side}
-          >
-            <SheetHeader className="sr-only">
-              <SheetTitle>Sidebar</SheetTitle>
-              <SheetDescription>Displays the mobile sidebar.</SheetDescription>
-            </SheetHeader>
-            <div className="flex h-full w-full flex-col">{children}</div>
-          </SheetContent>
-        </Sheet>
+        <div
+          ref={ref}
+          data-sidebar="sidebar"
+          data-mobile="true"
+          className={cn(
+            "relative flex h-svh shrink-0 flex-col overflow-hidden bg-sidebar text-sidebar-foreground transition-[width] duration-200 ease-linear md:hidden",
+            openMobile ? "border-r border-sidebar-border" : "w-0 border-r-0 pointer-events-none",
+            className
+          )}
+          style={
+            {
+              width: openMobile ? mobileWidth : 0,
+            } as React.CSSProperties
+          }
+          {...props}
+        >
+          <div className="flex h-full w-full flex-col">{children}</div>
+        </div>
       );
     }
 
     return (
       <div
         ref={ref}
-        className="group peer hidden text-sidebar-foreground md:block"
+        className="group peer hidden shrink-0 text-sidebar-foreground md:block"
         data-state={state}
         data-collapsible={state === "collapsed" ? collapsible : ""}
         data-variant={variant}
