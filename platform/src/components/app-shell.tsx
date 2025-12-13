@@ -4,7 +4,7 @@ import { AppSidebar } from "~/components/app-sidebar";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
-    <SidebarProvider className="bg-sidebar">
+    <SidebarProvider className="bg-sidebar" open={true}>
       <AppSidebar />
       <div className="h-svh min-w-0 flex-1 overflow-hidden lg:p-2">
         <div className="flex h-full w-full flex-col overflow-hidden bg-background lg:rounded-md lg:border">

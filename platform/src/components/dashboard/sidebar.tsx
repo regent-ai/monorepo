@@ -34,6 +34,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarSeparator,
+  useSidebar,
 } from "~/components/ui/sidebar";
 import { WalletProfile } from "~/components/wallet/wallet-profile";
 
@@ -93,13 +94,22 @@ const plannedItems = [
 ] as const;
 
 export function DashboardSidebar() {
+  const { isMobile, setOpenMobile } = useSidebar();
   const routerState = useRouterState();
   const currentPath = routerState.location.pathname;
 
+  function closeMobileSidebar() {
+    if (isMobile) setOpenMobile(false);
+  }
+
   return (
-    <Sidebar collapsible="none">
+    <Sidebar collapsible="offcanvas">
       <SidebarHeader className="p-4">
-        <Link to="/" className="group flex items-center gap-3">
+        <Link
+          to="/"
+          className="group flex items-center gap-3"
+          onClick={closeMobileSidebar}
+        >
           <div className="relative flex size-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 shadow-lg shadow-cyan-500/25 transition-transform group-hover:scale-105">
             <Sparkles className="size-4 text-white" />
             <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-cyan-400 to-blue-500 opacity-0 blur-lg transition-opacity group-hover:opacity-50" />
@@ -138,7 +148,7 @@ export function DashboardSidebar() {
                         : ""
                     }
                   >
-                    <Link to={item.to}>
+                    <Link to={item.to} onClick={closeMobileSidebar}>
                       <item.icon
                         className={
                           isActive ? "text-cyan-400" : "text-muted-foreground"
@@ -177,6 +187,7 @@ export function DashboardSidebar() {
                   href="https://eips.ethereum.org/EIPS/eip-8004"
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={closeMobileSidebar}
                   className="text-muted-foreground hover:text-foreground"
                 >
                   <ExternalLink className="size-4" />
@@ -188,6 +199,7 @@ export function DashboardSidebar() {
               <SidebarMenuButton asChild tooltip="Documentation">
                 <a
                   href="/docs"
+                  onClick={closeMobileSidebar}
                   className="text-muted-foreground hover:text-foreground"
                 >
                   <ExternalLink className="size-4" />

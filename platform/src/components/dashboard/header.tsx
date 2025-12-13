@@ -18,6 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { Input } from "~/components/ui/input";
+import { SidebarTrigger } from "~/components/ui/sidebar";
 import { WalletConnector } from "~/components/wallet/wallet-connector";
 
 export function DashboardHeader() {
@@ -35,6 +36,7 @@ export function DashboardHeader() {
   return (
     <header className="sticky top-0 z-10 flex w-full items-center gap-2 border-b bg-card px-3 py-3 sm:gap-3 sm:px-6 sm:py-4">
       <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
+        <SidebarTrigger className="-ml-1 md:hidden" />
         <Link
           to="/"
           className="shrink-0 rounded-md p-1 transition-colors hover:bg-muted"
