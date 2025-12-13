@@ -11,6 +11,7 @@ import {
   MessageCircle,
   MessagesSquare,
   Network,
+  Newspaper,
   Radio,
   Search,
   Send,
@@ -187,16 +188,16 @@ export function DashboardSidebar() {
           </SidebarGroupLabel>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="ERC-8004 Spec">
+              <SidebarMenuButton asChild tooltip="News">
                 <a
-                  href="https://eips.ethereum.org/EIPS/eip-8004"
+                  href="https://news.regent.cx"
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={closeMobileSidebar}
                   className="text-muted-foreground hover:text-foreground"
                 >
-                  <ExternalLink className="size-4" />
-                  <span>ERC-8004 Spec</span>
+                  <Newspaper className="size-4" />
+                  <span>News</span>
                 </a>
               </SidebarMenuButton>
             </SidebarMenuItem>

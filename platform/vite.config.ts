@@ -165,6 +165,9 @@ export default defineConfig({
     alias: {
       "~": resolve(__dirname, "src"),
       "@": resolve(__dirname, "src"),
+      // Fix Vercel SSR runtime: recharts imports `decimal.js-light/decimal` which is not a valid ESM entry.
+      // Map to the actual ESM file so Node can resolve it.
+      "decimal.js-light/decimal": "decimal.js-light/decimal.mjs",
     },
   },
 });

@@ -63,10 +63,41 @@ export interface AgentFilters {
   hasEndpoint?: boolean;
 }
 
+export interface FetchAgentsOptions {
+  /**
+   * If true, fetch agent metadata for entries where the subgraph `registrationFile` is null.
+   * This can be very expensive for large lists (IPFS/http fan-out), so it is **off by default**.
+   */
+  resolveMissingMetadata?: boolean;
+}
+
 type AgentWhere = Record<string, unknown>;
 
 type SubgraphAgent = Omit<Agent, "metadataUri"> & { agentURI: string };
 type SubgraphAgentWithFeedback = SubgraphAgent & { feedback: Feedback[] };
+
+async function mapWithConcurrency<T, U>(
+  items: T[],
+  concurrency: number,
+  fn: (item: T, index: number) => Promise<U>
+): Promise<U[]> {
+  const results = new Array<U>(items.length);
+  let nextIndex = 0;
+
+  async function worker() {
+    while (nextIndex < items.length) {
+      const i = nextIndex;
+      nextIndex += 1;
+      results[i] = await fn(items[i]!, i);
+    }
+  }
+
+  const workers = Array.from({ length: Math.min(concurrency, items.length) }, () =>
+    worker()
+  );
+  await Promise.all(workers);
+  return results;
+}
 
 function buildAgentWhere(filters?: AgentFilters): AgentWhere | null {
   if (!filters) return null;
@@ -103,9 +134,11 @@ function buildAgentWhere(filters?: AgentFilters): AgentWhere | null {
 export async function fetchAgents(
   first: number = 24,
   skip: number = 0,
-  filters?: AgentFilters
+  filters?: AgentFilters,
+  options?: FetchAgentsOptions
 ): Promise<Agent[]> {
   const where = buildAgentWhere(filters);
+  const shouldResolveMissingMetadata = options?.resolveMissingMetadata ?? false;
 
   const query = `
     query Agents($first: Int!, $skip: Int!, $where: Agent_filter) {
@@ -142,24 +175,23 @@ export async function fetchAgents(
     where,
   });
 
-  // Map agentURI to metadataUri and resolve missing metadata
-  const agents = await Promise.all(
-    data.agents.map(async (agent) => {
-      let registrationFile = agent.registrationFile;
-      if (!registrationFile && agent.agentURI) {
-        registrationFile = await resolveMetadataCached(agent.agentURI);
-      }
-
+  // Map agentURI to metadataUri; optionally resolve missing metadata (expensive).
+  if (!shouldResolveMissingMetadata) {
+    return data.agents.map((agent) => {
       const { agentURI, ...rest } = agent;
-      return {
-        ...rest,
-        metadataUri: agentURI,
-        registrationFile,
-      };
-    })
-  );
+      return { ...rest, metadataUri: agentURI, registrationFile: agent.registrationFile };
+    });
+  }
 
-  return agents;
+  return await mapWithConcurrency(data.agents, 8, async (agent) => {
+    let registrationFile = agent.registrationFile;
+    if (!registrationFile && agent.agentURI) {
+      registrationFile = await resolveMetadataCached(agent.agentURI);
+    }
+
+    const { agentURI, ...rest } = agent;
+    return { ...rest, metadataUri: agentURI, registrationFile };
+  });
 }
 
 /**
