@@ -672,14 +672,6 @@ export function RedeemWidget({ variant = "simple" }: RedeemWidgetProps) {
           >
             Animata II <ExternalLink className="size-3" />
           </a>
-          <a
-            href="https://opensea.io/collection/animata-pass"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 hover:text-foreground"
-          >
-            Regent Animata Pass <ExternalLink className="size-3" />
-          </a>
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>

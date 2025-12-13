@@ -1,101 +1,61 @@
-# Agent Instructions for regent-sdk
+# Regent SDK
 
-## Issue Tracking with bd (beads)
+TypeScript SDK for building Regent-native agents.
 
-**IMPORTANT**: This project uses **bd (beads)** for ALL issue tracking. Do NOT use markdown TODOs, task lists, or other tracking methods.
+## What This Is
 
-### Why bd?
+This workspace contains the core packages for building agents with Regent:
+- **@regent/core** — Agent runtime with extension system
+- **@regent/http** — HTTP handling extension
+- **@regent/payments** — x402 payment integration
+- **@regent/identity** — ERC-8004 on-chain identity
+- **@regent/a2a** — Agent-to-agent protocol
+- **@regent/erc8004** — ERC-8004 SDK for identity, discovery, reputation
 
-- Dependency-aware: Track blockers and relationships between issues
-- Git-friendly: Auto-syncs to JSONL for version control
-- Agent-optimized: JSON output, ready work detection, discovered-from links
-- Prevents duplicate tracking systems and confusion
+Key packages live under `regent-sdk/packages/`.
 
-### Quick Start
+## Development
 
-**Check for ready work:**
 ```bash
-bd ready --json
+# Install dependencies
+bun install
+
+# Build all packages
+bun run build
+
+# Run tests
+bun test
 ```
 
-**Create new issues:**
-```bash
-bd create "Issue title" -t bug|feature|task -p 0-4 --json
-bd create "Issue title" -p 1 --deps discovered-from:bd-123 --json
-bd create "Subtask" --parent <epic-id> --json  # Hierarchical subtask (gets ID like epic-id.1)
-```
+## Key Files
 
-**Claim and update:**
-```bash
-bd update bd-42 --status in_progress --json
-bd update bd-42 --priority 1 --json
-```
+| Package | Entry Point |
+|---------|-------------|
+| @regent/core | `packages/core/src/core/agent.ts` |
+| @regent/erc8004 | `packages/erc8004/src/index.ts` |
+| regent-sdk | `packages/sdk/src/index.ts` |
 
-**Complete work:**
-```bash
-bd close bd-42 --reason "Completed" --json
-```
+## Upstream Mirrors
 
-### Issue Types
+This workspace keeps **local mirrors** of upstream OSS repos for review/sync:
+- `lucid-agents/` (upstream: daydreamsai/lucid-agents)
+- `agent0-ts/` (upstream: agent0lab/agent0-ts)
 
-- `bug` - Something broken
-- `feature` - New functionality
-- `task` - Work item (tests, docs, refactoring)
-- `epic` - Large feature with subtasks
-- `chore` - Maintenance (dependencies, tooling)
-
-### Priorities
-
-- `0` - Critical (security, data loss, broken builds)
-- `1` - High (major features, important bugs)
-- `2` - Medium (default, nice-to-have)
-- `3` - Low (polish, optimization)
-- `4` - Backlog (future ideas)
-
-### Workflow for AI Agents
-
-1. **Check ready work**: `bd ready` shows unblocked issues
-2. **Claim your task**: `bd update <id> --status in_progress`
-3. **Work on it**: Implement, test, document
-4. **Discover new work?** Create linked issue:
-   - `bd create "Found bug" -p 1 --deps discovered-from:<parent-id>`
-5. **Complete**: `bd close <id> --reason "Done"`
-6. **Commit together**: Always commit the `.beads/issues.jsonl` file together with the code changes so issue state stays in sync with code state
-
-### Auto-Sync
-
-bd automatically syncs with git:
-- Exports to `.beads/issues.jsonl` after changes (5s debounce)
-- Imports from JSONL when newer (e.g., after `git pull`)
-- No manual export/import needed!
-
-### CLI Help
-
-Run `bd <command> --help` to see all available flags for any command.
-
-### Important Rules
-
-- Use bd for ALL task tracking
-- Always use `--json` flag for programmatic use
-- Link discovered work with `discovered-from` dependencies
-- Check `bd ready` before asking "what should I work on?"
-- Do NOT create markdown TODO lists
-- Do NOT use external issue trackers
-
-## Upstream mirrors (lucid-agents + agent0-ts)
-
-This monorepo keeps **local mirrors** of upstream OSS repos for review/sync.
-
-- They remain **separate git repos** (they each have their own `.git/`).
-- They are **not tracked** by the top-level monorepo repo (ignored via `monorepo/.gitignore`):
-
-- `monorepo/regent-sdk/lucid-agents/` (upstream: daydreamsai/lucid-agents)
-- `monorepo/regent-sdk/agent0-ts/` (upstream: agent0lab/agent0-ts)
+They remain **separate git repos** (each has its own `.git/`) and are **ignored** by the top-level monorepo.
 
 Use the helper script to fetch + report upstream changes:
 
 ```bash
-bun /Users/sean/Documents/regent/monorepo/regent-sdk/scripts/upstream-report.ts --clone
+bun scripts/upstream-report.ts --clone
 ```
 
-It reads/writes baseline sync state in `monorepo/regent-sdk/upstream-sync.json` (set `lastSyncedCommit` once you’ve applied changes to Regent forks).
+It reads/writes baseline sync state in `upstream-sync.json`.
+
+## Cross-References
+
+- **Used by**: `regent-cli`, `facilitator`, `platform`
+- **Related**: See root `AGENTS.md` for beads workflow
+
+## Issue Tracking
+
+See root `AGENTS.md` for beads workflow. Use `bd ready --json` to find work.

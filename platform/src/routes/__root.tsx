@@ -41,7 +41,17 @@ export const Route = createRootRouteWithContext<{
         content: "69398a7e8a7c4e55fec73d0c",
       },
     ],
-    links: [{ rel: "stylesheet", href: appCss }],
+    links: [
+      // Font preconnect for performance
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      // Google Fonts - JetBrains Mono for code, Outfit for headings
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@400;500;600;700&display=swap",
+      },
+      { rel: "stylesheet", href: appCss },
+    ],
   }),
   component: RootComponent,
 });

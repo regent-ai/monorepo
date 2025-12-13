@@ -2,12 +2,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   ArrowLeft,
-  ExternalLink,
   MessageSquare,
   RefreshCw,
   Zap,
   User,
-  Calendar,
   Star,
   Shield,
 } from "lucide-react";
@@ -16,13 +14,19 @@ import * as z from "zod";
 import {
   fetchAgentWithFeedback,
   type Agent,
-  type Feedback,
 } from "~/lib/erc8004/subgraph";
 import {
   formatAddress,
   formatTimestamp,
-  isReadableText,
+  formatIsoDateTime,
 } from "~/lib/erc8004/utils";
+import { fleetStatusToBadgeVariant } from "~/lib/fleet/utils";
+import {
+  EndpointLink,
+  FeedbackCard,
+  ScoreBadge,
+  StatCard,
+} from "~/components/agent";
 import {
   ensureFleetTenant,
   fetchFleetChat,
@@ -291,162 +295,6 @@ function AgentDetailPage() {
   );
 }
 
-// =============================================================================
-// Components
-// =============================================================================
-
-function StatCard({
-  icon,
-  label,
-  value,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-}) {
-  return (
-    <div className="rounded-xl bg-muted/50 p-3">
-      <div className="flex items-center gap-2 text-muted-foreground">
-        {icon}
-        <span className="text-xs">{label}</span>
-      </div>
-      <p className="mt-1 text-lg font-semibold">{value}</p>
-    </div>
-  );
-}
-
-function EndpointLink({ label, url }: { label: string; url: string }) {
-  return (
-    <a
-      href={url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="group flex items-center justify-between rounded-lg border border-border/50 bg-muted/30 px-3 py-2 transition-colors hover:border-primary/30 hover:bg-muted/50"
-    >
-      <div>
-        <span className="text-xs text-muted-foreground">{label}</span>
-        <p className="max-w-[200px] truncate font-mono text-sm">{url}</p>
-      </div>
-      <ExternalLink className="h-4 w-4 text-muted-foreground transition-colors group-hover:text-primary" />
-    </a>
-  );
-}
-
-function ScoreBadge({
-  score,
-  size = "default",
-}: {
-  score: number;
-  size?: "default" | "lg";
-}) {
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return "text-chart-2 bg-chart-2/10";
-    if (score >= 60) return "text-chart-3 bg-chart-3/10";
-    if (score >= 40) return "text-chart-5 bg-chart-5/10";
-    return "text-destructive bg-destructive/10";
-  };
-
-  return (
-    <span
-      className={`inline-flex items-center justify-center rounded-lg font-mono font-semibold ${getScoreColor(score)} ${
-        size === "lg" ? "px-3 py-1.5 text-base" : "px-2 py-1 text-sm"
-      }`}
-    >
-      {score}
-    </span>
-  );
-}
-
-function ScoreBar({ score }: { score: number }) {
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return "from-chart-2 to-chart-2/50";
-    if (score >= 60) return "from-chart-3 to-chart-3/50";
-    if (score >= 40) return "from-chart-5 to-chart-5/50";
-    return "from-destructive to-destructive/50";
-  };
-
-  return (
-    <div className="relative h-2 w-full overflow-hidden rounded-full bg-muted">
-      <div
-        className={`absolute left-0 top-0 h-full rounded-full bg-gradient-to-r ${getScoreColor(score)} transition-all`}
-        style={{ width: `${score}%` }}
-      />
-    </div>
-  );
-}
-
-function FeedbackCard({
-  feedback,
-  index,
-}: {
-  feedback: Feedback;
-  index: number;
-}) {
-  const score = parseInt(feedback.score);
-  const text = feedback.feedbackFile?.text;
-  const capability = feedback.feedbackFile?.capability;
-  const skill = feedback.feedbackFile?.skill;
-  const tag1 = isReadableText(feedback.tag1) ? feedback.tag1 : null;
-  const tag2 = isReadableText(feedback.tag2) ? feedback.tag2 : null;
-
-  return (
-    <div
-      className="group overflow-hidden rounded-2xl border border-border/50 bg-card/50 p-5 backdrop-blur-sm transition-all hover:border-border"
-      style={{ animationDelay: `${index * 50}ms` }}
-    >
-      {/* Header */}
-      <div className="mb-4 flex items-start justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <ScoreBadge score={score} />
-          <ScoreBar score={score} />
-        </div>
-      </div>
-
-      {/* Review text */}
-      {text && (
-        <p className="mb-4 text-sm leading-relaxed text-foreground/90">{text}</p>
-      )}
-
-      {/* Tags */}
-      {(capability || skill || tag1 || tag2) && (
-        <div className="mb-4 flex flex-wrap gap-2">
-          {capability && (
-            <span className="rounded-md bg-primary/10 px-2 py-1 text-xs text-primary">
-              {capability}
-            </span>
-          )}
-          {skill && (
-            <span className="rounded-md bg-chart-2/10 px-2 py-1 text-xs text-chart-2">
-              {skill}
-            </span>
-          )}
-          {tag1 && (
-            <span className="rounded-md bg-muted px-2 py-1 text-xs text-muted-foreground">
-              {tag1}
-            </span>
-          )}
-          {tag2 && (
-            <span className="rounded-md bg-muted px-2 py-1 text-xs text-muted-foreground">
-              {tag2}
-            </span>
-          )}
-        </div>
-      )}
-
-      {/* Footer */}
-      <div className="flex items-center justify-between border-t border-border/50 pt-3 text-xs text-muted-foreground">
-        <div className="flex items-center gap-1">
-          <User className="h-3 w-3" />
-          <span className="font-mono">{formatAddress(feedback.clientAddress)}</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <Calendar className="h-3 w-3" />
-          <span>{formatTimestamp(feedback.createdAt)}</span>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 // =============================================================================
 // Operations tab (fleet)
@@ -581,7 +429,7 @@ function AgentOperationsPanel({ erc8004Id }: { erc8004Id: string }) {
             ) : orchestratorQuery.isError ? (
               <Badge variant="destructive">error</Badge>
             ) : orchestrator ? (
-              <Badge variant={opsStatusToBadgeVariant(orchestrator.status as any)}>
+              <Badge variant={fleetStatusToBadgeVariant(orchestrator.status as any)}>
                 {String(orchestrator.status ?? "unknown")}
               </Badge>
             ) : (
@@ -717,7 +565,7 @@ function AgentOperationsPanel({ erc8004Id }: { erc8004Id: string }) {
                     </p>
                   </div>
                   <div className="flex items-center gap-3">
-                    <Badge variant={opsStatusToBadgeVariant(String(a.status) as any)}>
+                    <Badge variant={fleetStatusToBadgeVariant(String(a.status) as any)}>
                       {String(a.status ?? "unknown")}
                     </Badge>
                     <span className="text-xs text-muted-foreground tabular-nums">
@@ -843,36 +691,6 @@ function AgentOperationsPanel({ erc8004Id }: { erc8004Id: string }) {
   );
 }
 
-function opsStatusToBadgeVariant(
-  status: string | null
-): "default" | "secondary" | "destructive" | "outline" {
-  switch (status) {
-    case "blocked":
-      return "destructive";
-    case "executing":
-      return "default";
-    case "waiting":
-      return "outline";
-    case "complete":
-      return "secondary";
-    case "idle":
-      return "secondary";
-    default:
-      return "outline";
-  }
-}
-
-function formatIsoDateTime(value: string): string {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value || "—";
-  return date.toLocaleString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  });
-}
 
 function renderEventTitle(event: Record<string, unknown>): string {
   const sourceType = String(event.sourceType ?? "");

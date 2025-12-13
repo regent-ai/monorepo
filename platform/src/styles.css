@@ -1,7 +1,4 @@
-/* JetBrains Mono for code/data */
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
-/* Outfit for headings - distinctive geometric sans */
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap');
+/* Google Fonts are loaded via preconnect in __root.tsx for better performance */
 
 @import "@fontsource/geist-sans/latin.css";
 
@@ -142,10 +139,8 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
     @apply font-sans bg-background text-foreground;
   }
   button:not(:disabled),

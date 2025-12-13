@@ -19,6 +19,19 @@ export function formatTimestamp(timestamp: string): string {
   });
 }
 
+/** Formats an ISO datetime string to a readable format */
+export function formatIsoDateTime(value: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value || "—";
+  return date.toLocaleString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
 /** Checks if a string contains mostly readable ASCII characters */
 export function isReadableText(str: string | null): boolean {
   if (!str) return false;

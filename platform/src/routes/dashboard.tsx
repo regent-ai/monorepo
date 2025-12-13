@@ -4,6 +4,8 @@ import { ExternalLink, Loader2 } from "lucide-react";
 import { useMemo } from "react";
 
 import { fetchAgents } from "~/lib/erc8004/subgraph";
+import { formatIsoDateTime } from "~/lib/erc8004/utils";
+import { fleetStatusToBadgeVariant } from "~/lib/fleet/utils";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
@@ -183,7 +185,7 @@ function FleetDashboardRoute() {
                       </TableCell>
                       <TableCell>
                         {tenant ? (
-                          <Badge variant={statusToBadgeVariant(tenant.status)}>
+                          <Badge variant={fleetStatusToBadgeVariant(tenant.status)}>
                             {tenant.status || "unknown"}
                           </Badge>
                         ) : (
@@ -223,33 +225,5 @@ function FleetDashboardRoute() {
   );
 }
 
-function statusToBadgeVariant(status: FleetTenantRow["status"]): "default" | "secondary" | "destructive" | "outline" {
-  switch (status) {
-    case "blocked":
-      return "destructive";
-    case "executing":
-      return "default";
-    case "waiting":
-      return "outline";
-    case "complete":
-      return "secondary";
-    case "idle":
-      return "secondary";
-    default:
-      return "outline";
-  }
-}
-
-function formatIsoDateTime(value: string): string {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  });
-}
 
 

@@ -42,9 +42,11 @@ export function DashboardHeader() {
           className="shrink-0 rounded-md p-1 transition-colors hover:bg-muted"
         >
           <img
-            src="/Regent_Logo.svg"
+            src="/Regent_logo_white_transparent.png"
             alt="Regent"
-            className="h-7 w-7 sm:h-8 sm:w-8"
+            width={32}
+            height={32}
+            className="h-7 w-7 rounded-md sm:h-8 sm:w-8"
             decoding="async"
           />
         </Link>

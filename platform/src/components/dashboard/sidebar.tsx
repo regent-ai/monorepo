@@ -14,7 +14,6 @@ import {
   Radio,
   Search,
   Send,
-  Sparkles,
   Swords,
   Twitter,
   UserRound,
@@ -110,9 +109,15 @@ export function DashboardSidebar() {
           className="group flex items-center gap-3"
           onClick={closeMobileSidebar}
         >
-          <div className="relative flex size-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 shadow-lg shadow-cyan-500/25 transition-transform group-hover:scale-105">
-            <Sparkles className="size-4 text-white" />
-            <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-cyan-400 to-blue-500 opacity-0 blur-lg transition-opacity group-hover:opacity-50" />
+          <div className="relative size-8 shrink-0 overflow-hidden rounded-lg shadow-sm transition-transform group-hover:scale-105">
+            <img
+              src="/Regent_logo_white_transparent.png"
+              alt="Regent"
+              width={32}
+              height={32}
+              decoding="async"
+              className="h-full w-full object-contain"
+            />
           </div>
           <div className="flex flex-col group-data-[collapsible=icon]:hidden">
             <span className="font-semibold tracking-tight">Regent</span>

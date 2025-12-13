@@ -16,7 +16,7 @@ type ThemeProviderState = {
 };
 
 const initialState: ThemeProviderState = {
-  theme: "system",
+  theme: "dark",
   setTheme: () => null,
 };
 
@@ -27,7 +27,7 @@ const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 // https://github.com/pacocoursey/next-themes/blob/main/next-themes/src/index.tsx
 export function ThemeProvider({
   children,
-  defaultTheme = "system",
+  defaultTheme = "dark",
   storageKey = "theme",
   ...props
 }: ThemeProviderProps) {
@@ -95,7 +95,7 @@ export function ThemeProvider({
         {/* Apply theme early to avoid FOUC */}
         {`document.documentElement.classList.toggle(
             'dark',
-            localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
+            localStorage.theme === 'dark' || !('theme' in localStorage)
             )`}
       </ScriptOnce>
       {children}

@@ -49,7 +49,7 @@ Other workspace folders:
 - Use **bd (beads)** for all tracking:
   - Check ready work: `bd ready --json`
   - Create/track issues: `bd create ... --json`, `bd update ... --json`, `bd close ... --json`
-  - Prefer the **nearest** `.beads/` project (folder-local). For cross-project work, use the workspace root project at `/Users/sean/Documents/regent/.beads/`.
+  - Prefer the **nearest** `.beads/` project (folder-local). For cross-project work, use the workspace root `.beads/` directory.
 
 ### Safety
 
