@@ -17,12 +17,7 @@ node_modules
 .netlify
 dist
 /build/
-/api/
 /server/build
 /public/build
 
 .tanstack
-
-animata-drop-save
-fleet-dashboard
-teaser-web

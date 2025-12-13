@@ -53,9 +53,6 @@ export function WalletProfile({ className }: WalletProfileProps) {
           <Wallet className="size-4 text-muted-foreground" />
           <div className="text-sm font-semibold">Wallet</div>
         </div>
-        <p className="mt-2 text-xs text-muted-foreground">
-          Connect a wallet on Base to redeem Animata passes.
-        </p>
         <div className="mt-3">
           <WalletConnector size="lg" className="w-full justify-center" />
         </div>
